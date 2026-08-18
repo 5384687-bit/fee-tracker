@@ -836,17 +836,26 @@ function download(text, name, type){
 function viewSettings(){
   let h = '<a class="back" onclick="go(\'list\')">→ חזרה</a>';
   h += '<div class="card"><h2><span class="bar"></span>סנכרון בין מכשירים</h2>';
-  h += syncUrl
-    ? '<div class="okbox">הסנכרון פעיל. הנתונים בענן <b>מוצפנים</b> — בלי הסיסמה אי אפשר לקרוא אותם.</div>'
-    : '<div class="warnbox">כרגע הנתונים נשמרים <b>רק במכשיר הזה</b>. כדי לראות אותם גם מהטלפון, הפעילי סנכרון.</div>';
-  h += fld('כתובת הסנכרון', '<input type="text" id="s_url" dir="ltr" placeholder="https://api.npoint.io/..." value="' + esc(syncUrl) + '">');
-  h += '<div class="btnbar"><button class="btn sm" onclick="saveSyncUrl()">שמירה</button>' +
-       (syncUrl ? '<button class="btn sm sec" onclick="pullNow()">משיכה מהענן עכשיו</button>' : '') + '</div>';
-  h += '<div class="hint" style="margin-top:10px"><b>איך יוצרים כתובת:</b><br>' +
-       '1. נכנסים ל־<a href="https://www.npoint.io" target="_blank" rel="noopener">npoint.io</a><br>' +
-       '2. מדביקים בתיבה <span dir="ltr">{}</span> ולוחצים Save<br>' +
-       '3. מעתיקים את הכתובת שנוצרה ומדביקים כאן<br>' +
-       '4. במכשיר השני — אותה כתובת, אותה סיסמה</div></div>';
+  if(!syncUrl){
+    h += '<div class="warnbox">כרגע הנתונים נשמרים <b>רק במכשיר הזה</b>.<br>' +
+         'לחיצה אחת מפעילה סנכרון — ומכאן זה אוטומטי לגמרי, בלי לעשות שום דבר בכל פעם.</div>' +
+         '<button class="btn full" id="syncBtn" onclick="createBin()">🔗 הפעלת סנכרון</button>';
+  } else {
+    h += '<div class="okbox">✓ הסנכרון פעיל. כל שינוי נשמר בענן לבד, <b>מוצפן</b> — ' +
+         'בלי הסיסמה שלך אי אפשר לקרוא אותו.</div>';
+    h += '<div style="font-size:13px;font-weight:600;margin-bottom:7px">חיבור מכשיר נוסף</div>' +
+      '<div class="hint" style="margin:0 0 9px">פתחי את הקישור הזה בטלפון (או בכל מחשב אחר) ' +
+      'והזיני את אותה סיסמה. זהו — משם הכל מסונכרן.</div>' +
+      '<input type="text" id="s_link" dir="ltr" readonly value="' + esc(syncLink()) + '" ' +
+      'onclick="this.select()" style="font-size:12px;background:#f8fafc">' +
+      '<div class="btnbar" style="margin-top:9px">' +
+      '<button class="btn sm" onclick="copyLink()">📋 העתקת הקישור</button>' +
+      (navigator.share ? '<button class="btn sm sec" onclick="shareLink()">שליחה לטלפון</button>' : '') +
+      '<button class="btn sm sec" onclick="pullNow()">משיכה מהענן עכשיו</button></div>';
+    h += '<div class="hint" style="margin-top:12px">' +
+      '<a onclick="disconnectSync()" style="color:var(--ink3)">ניתוק הסנכרון במכשיר הזה</a></div>';
+  }
+  h += '</div>';
 
   const notifyOn = !!(DB.settings && DB.settings.notify);
   h += '<div class="card"><h2><span class="bar"></span>התראות</h2>' +
@@ -877,11 +886,45 @@ function viewSettings(){
     '<button class="btn sm dang" onclick="wipe()">מחיקת כל הנתונים</button></div></div>';
   return h;
 }
-async function saveSyncUrl(){
-  syncUrl = $('s_url').value.trim();
-  localStorage.setItem(LS_SYNC, syncUrl);
-  await save(); render();
-  toast(syncUrl ? 'סנכרון הופעל' : 'סנכרון בוטל');
+/** The link that connects another device: carries the store id, never the password. */
+function syncLink(){
+  return location.origin + location.pathname + '#sync=' + syncUrl.split('/').pop();
+}
+/** Create the cloud store from inside the app — no external site, no account. */
+async function createBin(){
+  const btn = $('syncBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'מפעיל…'; }
+  try{
+    const r = await fetch('https://www.npoint.io/documents', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({contents:'{}'})});
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    if(!j.token) throw new Error('no token');
+    syncUrl = 'https://api.npoint.io/' + j.token;
+    localStorage.setItem(LS_SYNC, syncUrl);
+    await save();          // seed the store with what is already on this device
+    render();
+    toast('הסנכרון הופעל ✓');
+  } catch(e){
+    if(btn){ btn.disabled = false; btn.textContent = '🔗 הפעלת סנכרון'; }
+    toast('לא הצלחתי להפעיל — בדקי חיבור לאינטרנט');
+  }
+}
+async function copyLink(){
+  const link = syncLink();
+  try{ await navigator.clipboard.writeText(link); toast('הקישור הועתק'); }
+  catch(e){ $('s_link').select(); document.execCommand('copy'); toast('הקישור הועתק'); }
+}
+async function shareLink(){
+  try{ await navigator.share({title:'מעקב שכר טרחה', url:syncLink()}); }
+  catch(e){ /* the user dismissed the share sheet */ }
+}
+async function disconnectSync(){
+  if(!confirm('לנתק את הסנכרון במכשיר הזה? הנתונים יישארו כאן ובענן, אבל יפסיקו להתעדכן זה מזה.')) return;
+  syncUrl = '';
+  localStorage.removeItem(LS_SYNC);
+  await save(); render(); toast('הסנכרון נותק');
 }
 async function pullNow(){
   try{
@@ -958,10 +1001,29 @@ let mode = 'unlock', bootBlob = null;
 
 async function boot(){
   syncUrl = localStorage.getItem(LS_SYNC) || '';
-  bootBlob = localBlob();
-  if(syncUrl){
-    try { const r = await fetchRemote(); if(r) bootBlob = r; } catch(e){ /* offline */ }
+  /* opened via the connect link from another device — adopt its store */
+  const m = location.hash.match(/sync=([A-Za-z0-9_-]+)/);
+  if(m){
+    syncUrl = 'https://api.npoint.io/' + m[1];
+    localStorage.setItem(LS_SYNC, syncUrl);
+    history.replaceState(null, '', location.pathname);
   }
+  bootBlob = localBlob();
+  let remoteFailed = false;
+  if(syncUrl){
+    try { const r = await fetchRemote(); if(r) bootBlob = r; }
+    catch(e){ remoteFailed = true; }
+  }
+
+  /* A synced device with nothing local must never start a fresh database while the
+     cloud copy is merely unreachable — that would overwrite it on the first save. */
+  if(syncUrl && remoteFailed && !bootBlob){
+    $('lockSub').innerHTML = 'אין כרגע חיבור לאינטרנט, ולא הצלחתי להגיע לנתונים בענן.<br>' +
+      'בדקי את החיבור ורענני את הדף.';
+    $('lockForm').classList.add('hide');
+    return;
+  }
+
   mode = bootBlob ? 'unlock' : 'setup';
   $('lockSub').innerHTML = mode === 'setup'
     ? 'ברוכה הבאה. בחרי סיסמה שתגן על הנתונים.<br>הנתונים מוצפנים — רק הסיסמה הזו פותחת אותם.'
@@ -986,6 +1048,22 @@ async function tryUnlock(silent){
   if(mode === 'setup'){
     if(p1.length < 4) return err.textContent = 'הסיסמה צריכה להיות באורך 4 תווים לפחות';
     if(p1 !== $('pass2').value) return err.textContent = 'הסיסמאות אינן זהות';
+    /* Last line of defence: never let a brand-new database land on top of a cloud
+       store that already holds data (e.g. the other device saved a moment ago). */
+    if(syncUrl){
+      try{
+        const r = await fetchRemote();
+        if(r){
+          bootBlob = r; mode = 'unlock';
+          $('pass2').classList.add('hide');
+          $('lockSub').textContent = 'כבר יש נתונים בענן. הזיני את הסיסמה הקיימת.';
+          $('lockGo').textContent = 'כניסה';
+          return;
+        }
+      } catch(e){
+        return err.textContent = 'אין חיבור לאינטרנט — נסי שוב בעוד רגע';
+      }
+    }
     SALT = crypto.getRandomValues(new Uint8Array(16));
     KEY = await deriveKey(p1, SALT);
     DB = freshDB();
