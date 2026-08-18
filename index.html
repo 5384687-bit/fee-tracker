@@ -1,0 +1,1230 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#1e3a5f">
+<title>מעקב שכר טרחה</title>
+<style>
+:root{
+  --bg:#f4f6f9; --card:#fff; --ink:#1e293b; --ink2:#64748b; --ink3:#94a3b8;
+  --line:#e2e8f0; --brand:#1e3a5f; --brand2:#2c5282; --gold:#b8963f;
+  --ok:#0f9d58; --okbg:#e8f5ee; --warn:#d97706; --warnbg:#fef4e6;
+  --bad:#dc2626; --badbg:#fdeaea;
+  --shadow:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.04);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;background:var(--bg);
+  color:var(--ink);font-size:15px;line-height:1.5;padding-bottom:78px}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:var(--brand2)}
+.hide{display:none !important}
+
+#lock{position:fixed;inset:0;background:linear-gradient(160deg,#1e3a5f,#0f1e33);
+  display:flex;align-items:center;justify-content:center;padding:20px;z-index:100;overflow-y:auto}
+.lockbox{background:#fff;border-radius:18px;padding:28px 24px;width:100%;max-width:390px;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);text-align:center}
+.lockbox h1{margin:0 0 6px;font-size:21px;color:var(--brand)}
+.lockbox .sub{color:var(--ink2);font-size:13px;margin-bottom:18px;line-height:1.6}
+.lockbox input{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:11px;
+  margin-bottom:10px;text-align:center}
+.lockbox input:focus{outline:none;border-color:var(--brand2)}
+.lockbox .go{width:100%;padding:13px;background:var(--brand);color:#fff;border-radius:11px;font-weight:600}
+.lockerr{color:var(--bad);font-size:13px;min-height:19px;margin-top:8px}
+.lockrow{display:flex;align-items:center;gap:7px;justify-content:center;font-size:12.5px;
+  color:var(--ink2);margin:10px 0 2px}
+.lockrow input{width:auto;margin:0}
+.locknote{font-size:11.5px;color:var(--ink3);margin-top:15px;line-height:1.65;
+  border-top:1px solid var(--line);padding-top:13px;text-align:right}
+
+header{background:linear-gradient(135deg,#1e3a5f,#2c5282);color:#fff;padding:15px 16px 13px;
+  position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(15,23,42,.15)}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+header h1{margin:0;font-size:17px;font-weight:600}
+header h1 span{color:var(--gold)}
+.hbtn{color:#fff;opacity:.75;font-size:19px;padding:2px 6px}
+.sync{font-size:11px;padding:5px 10px;border-radius:20px;background:rgba(255,255,255,.14);
+  margin-top:9px;display:inline-block}
+.sync.ok{background:rgba(16,185,129,.28)}
+.sync.err{background:rgba(239,68,68,.32)}
+.sync.warn{background:rgba(245,158,11,.32)}
+
+main{max-width:960px;margin:0 auto;padding:15px 13px 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:15px;margin-bottom:13px;box-shadow:var(--shadow)}
+.card h2{margin:0 0 13px;font-size:15.5px;display:flex;align-items:center;gap:8px}
+.card h2 .bar{width:4px;height:17px;background:var(--gold);border-radius:3px}
+.card h2 .cnt{font-size:11.5px;background:#eef2f7;color:var(--ink2);
+  padding:2px 8px;border-radius:20px;font-weight:600}
+.muted{color:var(--ink2)}
+.empty{text-align:center;color:var(--ink3);padding:24px 10px;font-size:13.5px}
+
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:13px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px;box-shadow:var(--shadow)}
+.stat .lbl{font-size:11.5px;color:var(--ink2);margin-bottom:4px}
+.stat .val{font-size:19px;font-weight:700;letter-spacing:-.3px}
+.stat.g .val{color:var(--ok)} .stat.r .val{color:var(--bad)} .stat.o .val{color:var(--warn)}
+@media(min-width:700px){.stats{grid-template-columns:repeat(4,1fr)}}
+
+.row{display:flex;align-items:flex-start;gap:11px;padding:11px 8px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:none}
+.row .grow{flex:1;min-width:0}
+.row .nm{font-weight:600;font-size:14.5px}
+.row .meta{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.55}
+.row .amt{font-weight:700;white-space:nowrap;font-size:14.5px;text-align:left}
+.clickable{cursor:pointer;border-radius:10px;transition:background .12s}
+.clickable:active,.clickable:hover{background:#f8fafc}
+
+.badge{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
+.b-paid{background:var(--okbg);color:var(--ok)}
+.b-pend{background:#eef2f7;color:var(--ink2)}
+.b-late{background:var(--badbg);color:var(--bad)}
+.b-soon{background:var(--warnbg);color:var(--warn)}
+.b-canc{background:#f1f5f9;color:var(--ink3)}
+
+.btn{padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;background:var(--brand);
+  color:#fff;display:inline-flex;align-items:center;gap:6px;justify-content:center}
+.btn:active{opacity:.85}
+.btn.sec{background:#eef2f7;color:var(--ink)}
+.btn.ok{background:var(--ok)}
+.btn.dang{background:var(--badbg);color:var(--bad)}
+.btn.sm{padding:7px 12px;font-size:12.5px;border-radius:9px}
+.btn.full{width:100%}
+.btn:disabled{opacity:.45;cursor:default}
+.btnbar{display:flex;gap:8px;flex-wrap:wrap}
+
+label{display:block;font-size:12.5px;font-weight:600;color:var(--ink2);margin:0 0 5px}
+.fld{margin-bottom:12px}
+input[type=text],input[type=number],input[type=date],input[type=tel],input[type=email],
+input[type=password],select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--line);
+  border-radius:10px;background:#fff;transition:border-color .12s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand2)}
+textarea{resize:vertical;min-height:62px}
+input[type=date],input[type=number]{direction:ltr;text-align:right}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{padding:8px 13px;border-radius:20px;border:1.5px solid var(--line);background:#fff;font-size:13px;font-weight:500}
+.chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:60;
+  display:flex;align-items:flex-end;justify-content:center}
+.modal-in{background:#fff;border-radius:18px 18px 0 0;width:100%;max-width:620px;
+  max-height:92vh;overflow-y:auto;padding:16px 15px calc(20px + env(safe-area-inset-bottom))}
+@media(min-width:700px){.modal{align-items:center;padding:20px}
+  .modal-in{border-radius:16px;max-height:88vh}}
+.modal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;
+  position:sticky;top:-16px;background:#fff;padding:6px 0 9px;z-index:2}
+.modal-h h3{margin:0;font-size:17px}
+.x{font-size:25px;color:var(--ink3);line-height:1;padding:0 8px}
+
+nav{position:fixed;bottom:0;right:0;left:0;background:#fff;border-top:1px solid var(--line);
+  display:flex;z-index:30;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 12px rgba(15,23,42,.06)}
+nav button{flex:1;padding:9px 2px 8px;font-size:10.5px;color:var(--ink3);
+  display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:600}
+nav button .ic{font-size:18px;line-height:1}
+nav button.on{color:var(--brand)}
+
+.search{margin-bottom:12px}
+.progbar{height:7px;background:#eef2f7;border-radius:5px;overflow:hidden;margin-top:8px}
+.progbar i{display:block;height:100%;background:linear-gradient(90deg,#0f9d58,#34d399);border-radius:5px}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.kv:last-child{border-bottom:none}
+.kv b{font-weight:700}
+.toast{position:fixed;bottom:88px;right:50%;transform:translateX(50%);background:var(--ink);
+  color:#fff;padding:11px 20px;border-radius:24px;font-size:13.5px;z-index:90;
+  box-shadow:0 6px 20px rgba(0,0,0,.25);opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.hint{font-size:12px;color:var(--ink3);line-height:1.6;margin-top:6px}
+.warnbox{background:var(--warnbg);border:1px solid #fcd9a0;border-radius:11px;padding:11px 12px;
+  font-size:12.5px;color:#8a5a08;line-height:1.65;margin-bottom:12px}
+.okbox{background:var(--okbg);border:1px solid #b6e2c8;border-radius:11px;padding:11px 12px;
+  font-size:12.5px;color:#0b6b3d;line-height:1.65;margin-bottom:12px}
+.sechead{font-size:11.5px;font-weight:700;color:var(--ink3);margin:16px 0 6px;letter-spacing:.4px}
+.back{font-size:13px;color:var(--brand2);font-weight:600;margin-bottom:10px;display:inline-block}
+table.rep{width:100%;border-collapse:collapse;font-size:13px}
+table.rep th{text-align:right;font-size:11.5px;color:var(--ink2);padding:7px 6px;border-bottom:1.5px solid var(--line)}
+table.rep td{padding:8px 6px;border-bottom:1px solid var(--line)}
+table.rep tr:last-child td{border-bottom:none}
+.bars{margin-top:4px}
+.barrow{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12.5px}
+.barrow .bl{width:62px;color:var(--ink2);white-space:nowrap}
+.barrow .bt{flex:1;height:20px;background:#eef2f7;border-radius:4px;overflow:hidden}
+.barrow .bt i{display:block;height:100%;background:linear-gradient(90deg,#2c5282,#4a7ab5)}
+.barrow .bv{width:74px;text-align:left;font-weight:600;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<!-- ============ LOCK ============ -->
+<div id="lock">
+  <div class="lockbox">
+    <div style="font-size:34px;margin-bottom:6px">⚖️</div>
+    <h1>מעקב שכר טרחה</h1>
+    <div class="sub" id="lockSub">טוען…</div>
+    <div id="lockForm" class="hide">
+      <input type="password" id="pass1" placeholder="סיסמה" autocomplete="current-password">
+      <input type="password" id="pass2" class="hide" placeholder="אימות סיסמה" autocomplete="new-password">
+      <button class="go" id="lockGo">כניסה</button>
+      <div class="lockrow">
+        <input type="checkbox" id="remember">
+        <label for="remember" style="margin:0;font-weight:500;color:var(--ink2)">זכור אותי במכשיר הזה</label>
+      </div>
+      <div class="lockerr" id="lockErr"></div>
+      <div class="locknote" id="lockNote"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" class="hide">
+<header>
+  <div class="hrow">
+    <h1>מעקב <span>שכר טרחה</span></h1>
+    <button class="hbtn" onclick="go('settings')" title="הגדרות">⚙️</button>
+  </div>
+  <div class="sync" id="syncStatus">☁️ מקומי בלבד</div>
+</header>
+
+<main id="view"></main>
+
+<nav>
+  <button data-nav="dash"     onclick="go('dash')"><span class="ic">📊</span>דשבורד</button>
+  <button data-nav="clients"  onclick="go('clients')"><span class="ic">👤</span>לקוחות</button>
+  <button data-nav="matters"  onclick="go('matters')"><span class="ic">📁</span>תיקים</button>
+  <button data-nav="payments" onclick="go('payments')"><span class="ic">💰</span>תשלומים</button>
+  <button data-nav="reports"  onclick="go('reports')"><span class="ic">📈</span>דוחות</button>
+</nav>
+</div>
+
+<div id="modalHost"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+/* ==================================================================
+   1. CONSTANTS
+   ================================================================== */
+const LS_BLOB = 'ft_blob', LS_SYNC = 'ft_sync', LS_PASS = 'ft_pass';
+const PBKDF2_ITER = 250000;
+
+const MATTER_TYPES = ['מכר','רכישה','שכירות','צוואה / ירושה','ייפוי כוח','הסכם ממון','ליטיגציה','ייעוץ','אחר'];
+const METHODS = ['העברה בנקאית','מזומן','צ׳ק','אשראי','ביט / פייבוקס','אחר'];
+const VAT_MODES = {plus:'בתוספת מע״מ', included:'כולל מע״מ', none:'ללא מע״מ'};
+
+let DB = null;          // decrypted data
+let KEY = null;         // CryptoKey
+let SALT = null;        // Uint8Array
+let screen = 'dash';
+let curClient = null, curMatter = null;
+let syncUrl = '';
+let dirty = false;      // local change not yet pushed
+
+/* ==================================================================
+   2. SMALL UTILITIES
+   ================================================================== */
+const $ = id => document.getElementById(id);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function money(n){
+  const v = Math.round((Number(n) || 0) * 100) / 100;
+  return '₪' + v.toLocaleString('he-IL', {maximumFractionDigits: 2});
+}
+function todayKey(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function heDate(key){
+  if(!key) return '—';
+  const [y,m,d] = key.split('-').map(Number);
+  return new Date(y, m-1, d).toLocaleDateString('he-IL', {day:'numeric', month:'numeric', year:'2-digit'});
+}
+function daysUntil(key){
+  if(!key) return 9999;
+  const [y,m,d] = key.split('-').map(Number);
+  const t = new Date(); t.setHours(0,0,0,0);
+  return Math.round((new Date(y, m-1, d) - t) / 86400000);
+}
+function addMonths(key, n){
+  const [y,m,d] = key.split('-').map(Number);
+  const dt = new Date(y, m-1+n, d);
+  return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+}
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ==================================================================
+   3. CRYPTO  (AES-GCM 256, key from passphrase via PBKDF2)
+   ================================================================== */
+const te = new TextEncoder(), td = new TextDecoder();
+const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+
+async function deriveKey(pass, salt){
+  const base = await crypto.subtle.importKey('raw', te.encode(pass), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2', salt, iterations:PBKDF2_ITER, hash:'SHA-256'},
+    base, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']);
+}
+async function encryptDB(obj, key, salt){
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, key, te.encode(JSON.stringify(obj)));
+  return {ft:1, alg:'AES-GCM-256', salt:b64(salt), iv:b64(iv), ct:b64(ct)};
+}
+async function decryptDB(blob, key){
+  const pt = await crypto.subtle.decrypt(
+    {name:'AES-GCM', iv:unb64(blob.iv)}, key, unb64(blob.ct));
+  return JSON.parse(td.decode(pt));
+}
+const isBlob = b => b && b.ft === 1 && b.ct && b.iv && b.salt;
+
+/* ==================================================================
+   4. STORAGE + SYNC
+   ================================================================== */
+function freshDB(){
+  return {v:1, updatedAt:new Date().toISOString(), settings:{vatRate:18},
+          clients:[], matters:[], payments:[]};
+}
+function localBlob(){
+  try { return JSON.parse(localStorage.getItem(LS_BLOB)); } catch(e){ return null; }
+}
+async function fetchRemote(){
+  if(!syncUrl) return null;
+  const res = await fetch(syncUrl, {cache:'no-store'});
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  const j = await res.json();
+  return isBlob(j) ? j : null;
+}
+async function pushRemote(blob){
+  if(!syncUrl) return;
+  const res = await fetch(syncUrl, {method:'POST', headers:{'Content-Type':'application/json'},
+                                    body:JSON.stringify(blob)});
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+}
+function setSync(state, text){
+  const el = $('syncStatus');
+  el.className = 'sync' + (state ? ' ' + state : '');
+  el.textContent = text;
+}
+
+/** Encrypt current DB, write locally, push to cloud when configured. */
+async function save(){
+  if(!DB || !KEY) return;
+  DB.updatedAt = new Date().toISOString();
+  const blob = await encryptDB(DB, KEY, SALT);
+  try { localStorage.setItem(LS_BLOB, JSON.stringify(blob)); }
+  catch(e){ toast('שגיאה בשמירה מקומית'); }
+  if(!syncUrl){ setSync('', '💾 נשמר במכשיר הזה'); return; }
+  setSync('warn', '☁️ מסנכרן…');
+  try {
+    await pushRemote(blob);
+    dirty = false;
+    setSync('ok', '☁️ מסונכרן');
+  } catch(e){
+    dirty = true;
+    setSync('err', '⚠️ אין חיבור — נשמר במכשיר, יסונכרן בהמשך');
+  }
+}
+/* retry a failed push when the network returns */
+setInterval(() => { if(dirty && syncUrl && navigator.onLine) save(); }, 30000);
+window.addEventListener('online', () => { if(dirty) save(); });
+
+/* ==================================================================
+   5. DOMAIN CALCULATIONS
+   ================================================================== */
+const vatRate = () => (DB.settings && DB.settings.vatRate != null ? DB.settings.vatRate : 18) / 100;
+
+/** Total the client owes, including VAT when the fee was agreed "plus VAT". */
+function matterGross(m){
+  const base = Number(m.feeAmount) || 0;
+  return m.vatMode === 'plus' ? base * (1 + vatRate()) : base;
+}
+const matterPayments = id => DB.payments.filter(p => p.matterId === id);
+const matterPaid     = id => matterPayments(id).filter(p => p.status === 'paid')
+                              .reduce((s,p) => s + (Number(p.amount)||0), 0);
+/** Sum of the planned schedule, ignoring cancelled rows. */
+const matterPlanned  = id => matterPayments(id).filter(p => p.status !== 'cancelled')
+                              .reduce((s,p) => s + (Number(p.amount)||0), 0);
+
+function matterBalance(m){ return matterGross(m) - matterPaid(m.id); }
+
+const clientMatters = id => DB.matters.filter(m => m.clientId === id);
+const clientName = id => { const c = DB.clients.find(c => c.id === id); return c ? c.name : '—'; };
+const matterById = id => DB.matters.find(m => m.id === id);
+
+/** Bucket a scheduled payment for display. */
+function payState(p){
+  if(p.status === 'cancelled') return 'canc';
+  if(p.status === 'paid') return 'paid';
+  const d = daysUntil(p.dueDate);
+  if(d < 0) return 'late';
+  if(d <= 14) return 'soon';
+  return 'pend';
+}
+const STATE_LABEL = {paid:'שולם', late:'באיחור', soon:'מתקרב', pend:'ממתין', canc:'בוטל'};
+
+/** Every open (unpaid, not cancelled) payment, earliest due first. */
+function openPayments(){
+  return DB.payments.filter(p => p.status === 'pending')
+    .sort((a,b) => (a.dueDate||'9999') < (b.dueDate||'9999') ? -1 : 1);
+}
+function activeMatters(){ return DB.matters.filter(m => m.status !== 'cancelled'); }
+
+/* ==================================================================
+   6. ROUTER
+   ================================================================== */
+function go(s, id){
+  screen = s;
+  if(s === 'client') curClient = id;
+  if(s === 'matter') curMatter = id;
+  window.scrollTo(0, 0);
+  render();
+}
+function render(){
+  const navMap = {client:'clients', matter:'matters'};
+  document.querySelectorAll('nav button').forEach(b =>
+    b.classList.toggle('on', b.dataset.nav === (navMap[screen] || screen)));
+  const fn = {dash:viewDash, clients:viewClients, client:viewClient, matters:viewMatters,
+              matter:viewMatter, payments:viewPayments, reports:viewReports, settings:viewSettings}[screen];
+  $('view').innerHTML = fn ? fn() : '';
+}
+
+/* ==================================================================
+   7. VIEW — DASHBOARD
+   ================================================================== */
+function viewDash(){
+  const ms = activeMatters();
+  const billed = ms.reduce((s,m) => s + matterGross(m), 0);
+  const collected = ms.reduce((s,m) => s + matterPaid(m.id), 0);
+  const open = openPayments();
+  const overdue = open.filter(p => payState(p) === 'late');
+  const soon = open.filter(p => { const d = daysUntil(p.dueDate); return d >= 0 && d <= 30; });
+  const outstanding = billed - collected;
+
+  /* money actually received this calendar month */
+  const mk = todayKey().slice(0,7);
+  const thisMonth = DB.payments.filter(p => p.status === 'paid' && (p.paidDate||'').slice(0,7) === mk)
+    .reduce((s,p) => s + (Number(p.amount)||0), 0);
+
+  let h = '<div class="stats">' +
+    stat('סה״כ שכ״ט שנקבע', money(billed)) +
+    stat('נגבה בפועל', money(collected), 'g') +
+    stat('יתרה לגבייה', money(outstanding), outstanding > 0 ? 'r' : 'g') +
+    stat('נכנס החודש', money(thisMonth), 'g') +
+  '</div>';
+
+  if(!DB.matters.length){
+    h += '<div class="card"><div class="empty">' +
+      '<div style="font-size:38px;margin-bottom:8px">⚖️</div>' +
+      'עוד אין תיקים במערכת.<br>מתחילים בהוספת לקוח, ואז תיק עם שכר הטרחה שסוכם.' +
+      '<div style="margin-top:16px"><button class="btn" onclick="go(\'clients\')">הוספת לקוח ראשון</button></div>' +
+      '</div></div>';
+    return h;
+  }
+
+  h += '<div class="card"><h2><span class="bar"></span>באיחור' +
+       (overdue.length ? '<span class="cnt">' + overdue.length + '</span>' : '') + '</h2>';
+  h += overdue.length
+    ? overdue.map(payRow).join('')
+    : '<div class="empty">אין תשלומים באיחור 🎉</div>';
+  h += '</div>';
+
+  h += '<div class="card"><h2><span class="bar"></span>ל־30 הימים הקרובים' +
+       (soon.length ? '<span class="cnt">' + soon.length + '</span>' : '') + '</h2>';
+  h += soon.length ? soon.map(payRow).join('') : '<div class="empty">אין תשלומים צפויים</div>';
+  h += '</div>';
+
+  /* matters still carrying a balance */
+  const owing = ms.filter(m => matterBalance(m) > 0.5)
+    .sort((a,b) => matterBalance(b) - matterBalance(a)).slice(0, 6);
+  if(owing.length){
+    h += '<div class="card"><h2><span class="bar"></span>תיקים עם יתרה פתוחה</h2>' +
+      owing.map(m => {
+        const g = matterGross(m), p = matterPaid(m.id);
+        const pct = g > 0 ? Math.min(100, Math.round(p / g * 100)) : 0;
+        return '<div class="row clickable" onclick="go(\'matter\',\'' + m.id + '\')">' +
+          '<div class="grow"><div class="nm">' + esc(clientName(m.clientId)) + '</div>' +
+          '<div class="meta">' + esc(m.title || m.type || '') + ' · שולם ' + pct + '%</div>' +
+          '<div class="progbar"><i style="width:' + pct + '%"></i></div></div>' +
+          '<div class="amt" style="color:var(--bad)">' + money(matterBalance(m)) + '</div></div>';
+      }).join('') + '</div>';
+  }
+  return h;
+}
+function stat(lbl, val, cls){
+  return '<div class="stat ' + (cls||'') + '"><div class="lbl">' + lbl + '</div><div class="val">' + val + '</div></div>';
+}
+/** One scheduled-payment line, used on the dashboard and the payments screen. */
+function payRow(p){
+  const m = matterById(p.matterId);
+  const st = payState(p);
+  const d = daysUntil(p.dueDate);
+  let when = heDate(p.dueDate);
+  if(st === 'late') when += ' · באיחור ' + Math.abs(d) + ' ימים';
+  else if(st === 'soon') when += (d === 0 ? ' · היום' : ' · בעוד ' + d + ' ימים');
+  return '<div class="row clickable" onclick="go(\'matter\',\'' + (m ? m.id : '') + '\')">' +
+    '<div class="grow"><div class="nm">' + esc(m ? clientName(m.clientId) : 'תיק שנמחק') + '</div>' +
+    '<div class="meta">' + esc((m && (m.title || m.type)) || '') + (p.notes ? ' · ' + esc(p.notes) : '') +
+    '<br>' + when + '</div></div>' +
+    '<div style="text-align:left"><div class="amt">' + money(p.amount) + '</div>' +
+    '<div style="margin-top:5px"><span class="badge b-' + st + '">' + STATE_LABEL[st] + '</span></div></div></div>';
+}
+
+/* ==================================================================
+   8. VIEW — CLIENTS
+   ================================================================== */
+let clientQ = '';
+function viewClients(){
+  const q = clientQ.trim();
+  let list = DB.clients.slice().sort((a,b) => a.name.localeCompare(b.name, 'he'));
+  if(q) list = list.filter(c => (c.name + ' ' + (c.phone||'') + ' ' + (c.idNumber||'')).includes(q));
+
+  let h = '<div class="btnbar" style="margin-bottom:12px">' +
+    '<button class="btn" onclick="editClient()">＋ לקוח חדש</button></div>';
+  h += '<div class="search"><input type="text" id="cq" placeholder="חיפוש לפי שם / טלפון / ת״ז" value="' +
+       esc(clientQ) + '" oninput="clientQ=this.value;renderClientList()"></div>';
+  h += '<div id="clientList">' + clientListHTML(list) + '</div>';
+  return h;
+}
+function renderClientList(){
+  const q = clientQ.trim();
+  let list = DB.clients.slice().sort((a,b) => a.name.localeCompare(b.name, 'he'));
+  if(q) list = list.filter(c => (c.name + ' ' + (c.phone||'') + ' ' + (c.idNumber||'')).includes(q));
+  $('clientList').innerHTML = clientListHTML(list);
+}
+function clientListHTML(list){
+  if(!list.length) return '<div class="card"><div class="empty">אין לקוחות להצגה</div></div>';
+  return '<div class="card">' + list.map(c => {
+    const ms = clientMatters(c.id);
+    const bal = ms.filter(m => m.status !== 'cancelled').reduce((s,m) => s + matterBalance(m), 0);
+    return '<div class="row clickable" onclick="go(\'client\',\'' + c.id + '\')">' +
+      '<div class="grow"><div class="nm">' + esc(c.name) + '</div>' +
+      '<div class="meta">' + ms.length + ' תיקים' + (c.phone ? ' · ' + esc(c.phone) : '') + '</div></div>' +
+      '<div class="amt" style="color:' + (bal > 0.5 ? 'var(--bad)' : 'var(--ok)') + '">' +
+      (bal > 0.5 ? money(bal) : '✓') + '</div></div>';
+  }).join('') + '</div>';
+}
+
+function viewClient(){
+  const c = DB.clients.find(x => x.id === curClient);
+  if(!c) return '<div class="card"><div class="empty">הלקוח לא נמצא</div></div>';
+  const ms = clientMatters(c.id);
+  const gross = ms.filter(m => m.status !== 'cancelled').reduce((s,m) => s + matterGross(m), 0);
+  const paid = ms.filter(m => m.status !== 'cancelled').reduce((s,m) => s + matterPaid(m.id), 0);
+
+  let h = '<a class="back" onclick="go(\'clients\')">→ חזרה ללקוחות</a>';
+  h += '<div class="card"><h2><span class="bar"></span>' + esc(c.name) + '</h2>';
+  if(c.phone)    h += '<div class="kv"><span class="muted">טלפון</span><b><a href="tel:' + esc(c.phone) + '">' + esc(c.phone) + '</a></b></div>';
+  if(c.email)    h += '<div class="kv"><span class="muted">אימייל</span><b>' + esc(c.email) + '</b></div>';
+  if(c.idNumber) h += '<div class="kv"><span class="muted">ת״ז</span><b>' + esc(c.idNumber) + '</b></div>';
+  h += '<div class="kv"><span class="muted">סה״כ שכ״ט</span><b>' + money(gross) + '</b></div>';
+  h += '<div class="kv"><span class="muted">נגבה</span><b style="color:var(--ok)">' + money(paid) + '</b></div>';
+  h += '<div class="kv"><span class="muted">יתרה</span><b style="color:' +
+       (gross-paid > 0.5 ? 'var(--bad)' : 'var(--ok)') + '">' + money(gross - paid) + '</b></div>';
+  if(c.notes) h += '<div style="margin-top:10px;font-size:13px;white-space:pre-line;color:var(--ink2)">' + esc(c.notes) + '</div>';
+  h += '<div class="btnbar" style="margin-top:14px">' +
+    '<button class="btn sm sec" onclick="editClient(\'' + c.id + '\')">עריכה</button>' +
+    '<button class="btn sm" onclick="editMatter(null,\'' + c.id + '\')">＋ תיק חדש</button>' +
+    '<button class="btn sm dang" onclick="delClient(\'' + c.id + '\')">מחיקה</button></div></div>';
+
+  h += '<div class="card"><h2><span class="bar"></span>תיקים<span class="cnt">' + ms.length + '</span></h2>';
+  h += ms.length ? ms.map(matterRow).join('') : '<div class="empty">אין תיקים ללקוח זה</div>';
+  h += '</div>';
+  return h;
+}
+
+function editClient(id){
+  const c = id ? DB.clients.find(x => x.id === id) : null;
+  modal(c ? 'עריכת לקוח' : 'לקוח חדש',
+    fld('שם מלא *', '<input type="text" id="f_name" value="' + esc(c ? c.name : '') + '">') +
+    '<div class="grid2">' +
+      fld('טלפון', '<input type="tel" id="f_phone" value="' + esc(c ? c.phone : '') + '">') +
+      fld('ת״ז', '<input type="text" id="f_id" value="' + esc(c ? c.idNumber : '') + '">') +
+    '</div>' +
+    fld('אימייל', '<input type="email" id="f_email" value="' + esc(c ? c.email : '') + '">') +
+    fld('הערות', '<textarea id="f_notes">' + esc(c ? c.notes : '') + '</textarea>') +
+    '<button class="btn full" onclick="saveClient(' + (id ? "'" + id + "'" : 'null') + ')">שמירה</button>');
+  setTimeout(() => $('f_name').focus(), 80);
+}
+async function saveClient(id){
+  const name = $('f_name').value.trim();
+  if(!name) return toast('חובה להזין שם');
+  const data = {name, phone:$('f_phone').value.trim(), idNumber:$('f_id').value.trim(),
+                email:$('f_email').value.trim(), notes:$('f_notes').value.trim()};
+  if(id) Object.assign(DB.clients.find(x => x.id === id), data);
+  else DB.clients.push(Object.assign({id:uid(), createdAt:todayKey()}, data));
+  closeModal(); await save(); render(); toast('נשמר');
+}
+async function delClient(id){
+  const n = clientMatters(id).length;
+  if(!confirm(n ? 'ללקוח זה ' + n + ' תיקים. מחיקת הלקוח תמחק גם את התיקים והתשלומים שלו. להמשיך?'
+                : 'למחוק לקוח זה?')) return;
+  const mids = clientMatters(id).map(m => m.id);
+  DB.payments = DB.payments.filter(p => !mids.includes(p.matterId));
+  DB.matters  = DB.matters.filter(m => m.clientId !== id);
+  DB.clients  = DB.clients.filter(c => c.id !== id);
+  await save(); go('clients'); toast('נמחק');
+}
+
+/* ==================================================================
+   9. VIEW — MATTERS
+   ================================================================== */
+let matterQ = '', matterFilter = 'active';
+function viewMatters(){
+  let h = '<div class="btnbar" style="margin-bottom:12px">' +
+    '<button class="btn" onclick="editMatter()">＋ תיק חדש</button></div>';
+  h += '<div class="chips" style="margin-bottom:12px">' +
+    ['active','done','all'].map(f => '<button class="chip' + (matterFilter === f ? ' on' : '') +
+      '" onclick="matterFilter=\'' + f + '\';render()">' +
+      ({active:'פעילים', done:'הסתיימו', all:'הכל'})[f] + '</button>').join('') + '</div>';
+  h += '<div class="search"><input type="text" id="mq" placeholder="חיפוש לפי לקוח / כותרת" value="' +
+       esc(matterQ) + '" oninput="matterQ=this.value;renderMatterList()"></div>';
+  h += '<div id="matterList">' + matterListHTML() + '</div>';
+  return h;
+}
+function renderMatterList(){ $('matterList').innerHTML = matterListHTML(); }
+function matterListHTML(){
+  let list = DB.matters.slice();
+  if(matterFilter === 'active') list = list.filter(m => m.status === 'active' || !m.status);
+  if(matterFilter === 'done')   list = list.filter(m => m.status === 'done');
+  const q = matterQ.trim();
+  if(q) list = list.filter(m => (clientName(m.clientId) + ' ' + (m.title||'') + ' ' + (m.type||'')).includes(q));
+  list.sort((a,b) => matterBalance(b) - matterBalance(a));
+  if(!list.length) return '<div class="card"><div class="empty">אין תיקים להצגה</div></div>';
+  return '<div class="card">' + list.map(matterRow).join('') + '</div>';
+}
+function matterRow(m){
+  const g = matterGross(m), p = matterPaid(m.id), bal = g - p;
+  const pct = g > 0 ? Math.min(100, Math.round(p / g * 100)) : 0;
+  const late = matterPayments(m.id).some(x => payState(x) === 'late');
+  return '<div class="row clickable" onclick="go(\'matter\',\'' + m.id + '\')">' +
+    '<div class="grow"><div class="nm">' + esc(clientName(m.clientId)) +
+      (late ? ' <span class="badge b-late">באיחור</span>' : '') +
+      (m.status === 'done' ? ' <span class="badge b-paid">הסתיים</span>' : '') + '</div>' +
+    '<div class="meta">' + esc(m.title || '') + (m.type ? ' · ' + esc(m.type) : '') +
+      ' · ' + money(g) + '</div>' +
+    '<div class="progbar"><i style="width:' + pct + '%"></i></div></div>' +
+    '<div class="amt" style="color:' + (bal > 0.5 ? 'var(--bad)' : 'var(--ok)') + '">' +
+      (bal > 0.5 ? money(bal) : '✓ שולם') + '</div></div>';
+}
+
+function viewMatter(){
+  const m = matterById(curMatter);
+  if(!m) return '<div class="card"><div class="empty">התיק לא נמצא</div></div>';
+  const base = Number(m.feeAmount) || 0;
+  const g = matterGross(m), paid = matterPaid(m.id), bal = g - paid;
+  const planned = matterPlanned(m.id);
+  const pays = matterPayments(m.id).sort((a,b) => (a.dueDate||'') < (b.dueDate||'') ? -1 : 1);
+  const pct = g > 0 ? Math.min(100, Math.round(paid / g * 100)) : 0;
+
+  let h = '<a class="back" onclick="go(\'matters\')">→ חזרה לתיקים</a>';
+
+  h += '<div class="card"><h2><span class="bar"></span>' + esc(clientName(m.clientId)) + '</h2>';
+  h += '<div style="font-size:14px;margin-bottom:12px">' + esc(m.title || '') +
+       (m.type ? ' <span class="badge b-pend">' + esc(m.type) + '</span>' : '') + '</div>';
+  h += '<div class="kv"><span class="muted">שכ״ט שסוכם</span><b>' + money(base) + ' <span class="muted" style="font-weight:400">' + (VAT_MODES[m.vatMode]||'') + '</span></b></div>';
+  if(m.vatMode === 'plus')
+    h += '<div class="kv"><span class="muted">מע״מ ' + (vatRate()*100) + '%</span><b>' + money(g - base) + '</b></div>';
+  h += '<div class="kv"><span class="muted">סה״כ לתשלום</span><b>' + money(g) + '</b></div>';
+  h += '<div class="kv"><span class="muted">נגבה</span><b style="color:var(--ok)">' + money(paid) + '</b></div>';
+  h += '<div class="kv"><span class="muted">יתרה</span><b style="color:' +
+       (bal > 0.5 ? 'var(--bad)' : 'var(--ok)') + '">' + money(bal) + '</b></div>';
+  h += '<div class="progbar" style="margin-top:10px"><i style="width:' + pct + '%"></i></div>';
+  h += '<div class="hint">שולם ' + pct + '% מהתיק</div>';
+  if(m.openedAt) h += '<div class="kv" style="margin-top:6px"><span class="muted">נפתח</span><b>' + heDate(m.openedAt) + '</b></div>';
+  if(m.notes) h += '<div style="margin-top:10px;font-size:13px;white-space:pre-line;color:var(--ink2)">' + esc(m.notes) + '</div>';
+
+  /* schedule vs. agreed fee — a mismatch is usually a data-entry slip */
+  if(pays.length && Math.abs(planned - g) > 1){
+    h += '<div class="warnbox" style="margin-top:12px">סך התשלומים המתוכננים (' + money(planned) +
+         ') שונה מסכום שכר הטרחה (' + money(g) + ') — פער של ' + money(Math.abs(planned - g)) + '.</div>';
+  }
+  h += '<div class="btnbar" style="margin-top:14px">' +
+    '<button class="btn sm sec" onclick="editMatter(\'' + m.id + '\')">עריכה</button>' +
+    '<button class="btn sm sec" onclick="go(\'client\',\'' + m.clientId + '\')">כרטיס לקוח</button>' +
+    '<button class="btn sm dang" onclick="delMatter(\'' + m.id + '\')">מחיקה</button></div></div>';
+
+  h += '<div class="card"><h2><span class="bar"></span>תשלומים<span class="cnt">' + pays.length + '</span></h2>';
+  h += '<div class="btnbar" style="margin-bottom:12px">' +
+    '<button class="btn sm" onclick="editPayment(null,\'' + m.id + '\')">＋ תשלום</button>' +
+    '<button class="btn sm sec" onclick="planModal(\'' + m.id + '\')">פריסה לתשלומים</button></div>';
+  h += pays.length ? pays.map(p => payDetailRow(p)).join('')
+                   : '<div class="empty">עוד לא נקבעו תשלומים בתיק זה</div>';
+  h += '</div>';
+  return h;
+}
+/** Payment line inside a matter — includes the quick "mark paid" action. */
+function payDetailRow(p){
+  const st = payState(p);
+  return '<div class="row">' +
+    '<div class="grow"><div class="nm">' + money(p.amount) +
+      ' <span class="badge b-' + st + '">' + STATE_LABEL[st] + '</span></div>' +
+    '<div class="meta">' +
+      (p.status === 'paid'
+        ? 'שולם ' + heDate(p.paidDate) + (p.method ? ' · ' + esc(p.method) : '') +
+          (p.receiptNo ? ' · קבלה ' + esc(p.receiptNo) : '')
+        : 'לתשלום עד ' + heDate(p.dueDate)) +
+      (p.notes ? '<br>' + esc(p.notes) : '') + '</div>' +
+    '<div class="btnbar" style="margin-top:8px">' +
+      (p.status === 'pending'
+        ? '<button class="btn sm ok" onclick="markPaid(\'' + p.id + '\')">סמן כשולם</button>' : '') +
+      '<button class="btn sm sec" onclick="editPayment(\'' + p.id + '\')">עריכה</button>' +
+      '<button class="btn sm dang" onclick="delPayment(\'' + p.id + '\')">מחיקה</button>' +
+    '</div></div></div>';
+}
+
+function editMatter(id, clientId){
+  if(!DB.clients.length){ toast('צריך להוסיף לקוח קודם'); return go('clients'); }
+  const m = id ? matterById(id) : null;
+  const cid = m ? m.clientId : (clientId || DB.clients[0].id);
+  const opts = DB.clients.slice().sort((a,b) => a.name.localeCompare(b.name,'he'))
+    .map(c => '<option value="' + c.id + '"' + (c.id === cid ? ' selected' : '') + '>' + esc(c.name) + '</option>').join('');
+  const typeOpts = MATTER_TYPES.map(t =>
+    '<option value="' + esc(t) + '"' + (m && m.type === t ? ' selected' : '') + '>' + esc(t) + '</option>').join('');
+  const vm = m ? m.vatMode : 'plus';
+
+  modal(m ? 'עריכת תיק' : 'תיק חדש',
+    fld('לקוח *', '<select id="f_client">' + opts + '</select>') +
+    fld('כותרת התיק', '<input type="text" id="f_title" placeholder="למשל: מכירת דירה ברחוב הרצל 12" value="' +
+        esc(m ? m.title : '') + '">') +
+    '<div class="grid2">' +
+      fld('סוג', '<select id="f_type">' + typeOpts + '</select>') +
+      fld('תאריך פתיחה', '<input type="date" id="f_opened" value="' + esc(m ? m.openedAt : todayKey()) + '">') +
+    '</div>' +
+    fld('שכר טרחה שסוכם (₪) *',
+        '<input type="number" id="f_fee" step="0.01" min="0" value="' + (m ? m.feeAmount : '') + '">') +
+    fld('מע״מ', '<div class="chips" id="f_vat">' +
+        Object.keys(VAT_MODES).map(k => '<button type="button" class="chip' + (vm === k ? ' on' : '') +
+          '" data-v="' + k + '" onclick="pickChip(this)">' + VAT_MODES[k] + '</button>').join('') + '</div>' +
+        '<div class="hint" id="vatHint"></div>') +
+    (m ? fld('סטטוס', '<select id="f_status">' +
+        [['active','פעיל'],['done','הסתיים'],['cancelled','בוטל']].map(o =>
+          '<option value="' + o[0] + '"' + (m.status === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') +
+        '</select>') : '') +
+    fld('הערות', '<textarea id="f_mnotes">' + esc(m ? m.notes : '') + '</textarea>') +
+    '<button class="btn full" onclick="saveMatter(' + (id ? "'" + id + "'" : 'null') + ')">שמירה</button>');
+
+  const upd = () => {
+    const base = Number($('f_fee').value) || 0;
+    const mode = $('f_vat').querySelector('.on').dataset.v;
+    const tot = mode === 'plus' ? base * (1 + vatRate()) : base;
+    $('vatHint').textContent = 'סה״כ לתשלום: ' + money(tot);
+  };
+  $('f_fee').addEventListener('input', upd);
+  $('f_vat').addEventListener('click', () => setTimeout(upd, 0));
+  upd();
+}
+function pickChip(btn){
+  btn.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+}
+async function saveMatter(id){
+  const fee = Number($('f_fee').value);
+  if(!(fee >= 0) || $('f_fee').value === '') return toast('חובה להזין סכום שכר טרחה');
+  const data = {
+    clientId: $('f_client').value,
+    title: $('f_title').value.trim(),
+    type: $('f_type').value,
+    openedAt: $('f_opened').value,
+    feeAmount: fee,
+    vatMode: $('f_vat').querySelector('.on').dataset.v,
+    notes: $('f_mnotes').value.trim()
+  };
+  if($('f_status')) data.status = $('f_status').value;
+  if(id) Object.assign(matterById(id), data);
+  else {
+    const nm = Object.assign({id:uid(), status:'active', createdAt:todayKey()}, data);
+    DB.matters.push(nm); curMatter = nm.id;
+  }
+  closeModal(); await save();
+  if(!id) go('matter', curMatter); else render();
+  toast('נשמר');
+}
+async function delMatter(id){
+  if(!confirm('למחוק את התיק וכל התשלומים שלו?')) return;
+  DB.payments = DB.payments.filter(p => p.matterId !== id);
+  DB.matters = DB.matters.filter(m => m.id !== id);
+  await save(); go('matters'); toast('נמחק');
+}
+
+/* ---- split the agreed fee into N monthly instalments ---- */
+function planModal(matterId){
+  const m = matterById(matterId);
+  const remaining = matterGross(m) - matterPlanned(matterId);
+  modal('פריסה לתשלומים',
+    '<div class="hint" style="margin-bottom:12px">יתרה שטרם נפרסה: <b>' + money(remaining) + '</b></div>' +
+    '<div class="grid2">' +
+      fld('מספר תשלומים', '<input type="number" id="p_n" value="3" min="1" max="60">') +
+      fld('תשלום ראשון בתאריך', '<input type="date" id="p_first" value="' + todayKey() + '">') +
+    '</div>' +
+    fld('סכום כולל לפריסה (₪)',
+        '<input type="number" id="p_total" step="0.01" value="' + (Math.round(remaining*100)/100) + '">') +
+    '<div class="hint" id="p_hint"></div>' +
+    '<button class="btn full" style="margin-top:12px" onclick="doPlan(\'' + matterId + '\')">יצירת התשלומים</button>');
+  const upd = () => {
+    const n = Math.max(1, Number($('p_n').value) || 1);
+    const t = Number($('p_total').value) || 0;
+    $('p_hint').textContent = n + ' תשלומים חודשיים של ' + money(Math.round(t / n * 100) / 100) + ' כל אחד';
+  };
+  $('p_n').addEventListener('input', upd);
+  $('p_total').addEventListener('input', upd);
+  upd();
+}
+async function doPlan(matterId){
+  const n = Math.max(1, Math.min(60, Number($('p_n').value) || 1));
+  const total = Number($('p_total').value) || 0;
+  const first = $('p_first').value || todayKey();
+  if(total <= 0) return toast('סכום לא תקין');
+  /* round each instalment, put the rounding remainder on the last one */
+  const each = Math.round(total / n * 100) / 100;
+  for(let i = 0; i < n; i++){
+    const amt = (i === n - 1) ? Math.round((total - each * (n - 1)) * 100) / 100 : each;
+    DB.payments.push({id:uid(), matterId, amount:amt, dueDate:addMonths(first, i),
+                      paidDate:null, method:'', status:'pending', receiptNo:'',
+                      notes:'תשלום ' + (i+1) + ' מתוך ' + n, createdAt:todayKey()});
+  }
+  closeModal(); await save(); render(); toast(n + ' תשלומים נוצרו');
+}
+
+/* ==================================================================
+   10. PAYMENTS
+   ================================================================== */
+function editPayment(id, matterId){
+  const p = id ? DB.payments.find(x => x.id === id) : null;
+  const mid = p ? p.matterId : matterId;
+  const mOpts = DB.matters.map(m => '<option value="' + m.id + '"' + (m.id === mid ? ' selected' : '') +
+    '>' + esc(clientName(m.clientId) + ' — ' + (m.title || m.type || '')) + '</option>').join('');
+  const methodOpts = ['<option value=""></option>'].concat(METHODS.map(x =>
+    '<option value="' + esc(x) + '"' + (p && p.method === x ? ' selected' : '') + '>' + esc(x) + '</option>')).join('');
+
+  modal(p ? 'עריכת תשלום' : 'תשלום חדש',
+    fld('תיק *', '<select id="q_matter">' + mOpts + '</select>') +
+    '<div class="grid2">' +
+      fld('סכום (₪) *', '<input type="number" id="q_amt" step="0.01" min="0" value="' + (p ? p.amount : '') + '">') +
+      fld('לתשלום עד', '<input type="date" id="q_due" value="' + esc(p ? p.dueDate : todayKey()) + '">') +
+    '</div>' +
+    fld('סטטוס', '<select id="q_status" onchange="togglePaidFields()">' +
+      [['pending','ממתין'],['paid','שולם'],['cancelled','בוטל']].map(o =>
+        '<option value="' + o[0] + '"' + (p && p.status === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') +
+      '</select>') +
+    '<div id="paidFields" class="hide">' +
+      '<div class="grid2">' +
+        fld('תאריך תשלום', '<input type="date" id="q_paid" value="' + esc(p && p.paidDate ? p.paidDate : todayKey()) + '">') +
+        fld('אמצעי תשלום', '<select id="q_method">' + methodOpts + '</select>') +
+      '</div>' +
+      fld('מספר קבלה', '<input type="text" id="q_receipt" value="' + esc(p ? p.receiptNo : '') + '">') +
+    '</div>' +
+    fld('הערה', '<input type="text" id="q_notes" value="' + esc(p ? p.notes : '') + '">') +
+    '<button class="btn full" onclick="savePayment(' + (id ? "'" + id + "'" : 'null') + ')">שמירה</button>');
+  togglePaidFields();
+}
+function togglePaidFields(){
+  $('paidFields').classList.toggle('hide', $('q_status').value !== 'paid');
+}
+async function savePayment(id){
+  const amt = Number($('q_amt').value);
+  if(!(amt > 0)) return toast('חובה להזין סכום');
+  const status = $('q_status').value;
+  const data = {
+    matterId: $('q_matter').value, amount: amt, dueDate: $('q_due').value, status,
+    paidDate:  status === 'paid' ? $('q_paid').value : null,
+    method:    status === 'paid' ? $('q_method').value : '',
+    receiptNo: status === 'paid' ? $('q_receipt').value.trim() : '',
+    notes: $('q_notes').value.trim()
+  };
+  if(id) Object.assign(DB.payments.find(x => x.id === id), data);
+  else DB.payments.push(Object.assign({id:uid(), createdAt:todayKey()}, data));
+  closeModal(); await save(); render(); toast('נשמר');
+}
+/** Quick action: record today's date as the payment date. */
+function markPaid(id){
+  const p = DB.payments.find(x => x.id === id);
+  const methodOpts = ['<option value=""></option>'].concat(METHODS.map(x =>
+    '<option value="' + esc(x) + '">' + esc(x) + '</option>')).join('');
+  modal('רישום תשלום שהתקבל',
+    '<div class="okbox">סכום: <b>' + money(p.amount) + '</b></div>' +
+    '<div class="grid2">' +
+      fld('תאריך', '<input type="date" id="k_date" value="' + todayKey() + '">') +
+      fld('אמצעי', '<select id="k_method">' + methodOpts + '</select>') +
+    '</div>' +
+    fld('סכום שהתקבל בפועל (₪)', '<input type="number" id="k_amt" step="0.01" value="' + p.amount + '">') +
+    fld('מספר קבלה', '<input type="text" id="k_receipt">') +
+    '<button class="btn full ok" onclick="doMarkPaid(\'' + id + '\')">אישור</button>');
+}
+async function doMarkPaid(id){
+  const p = DB.payments.find(x => x.id === id);
+  p.status = 'paid';
+  p.paidDate = $('k_date').value || todayKey();
+  p.method = $('k_method').value;
+  p.receiptNo = $('k_receipt').value.trim();
+  const a = Number($('k_amt').value);
+  if(a > 0) p.amount = a;
+  closeModal(); await save(); render(); toast('נרשם כשולם ✓');
+}
+async function delPayment(id){
+  if(!confirm('למחוק תשלום זה?')) return;
+  DB.payments = DB.payments.filter(p => p.id !== id);
+  await save(); render(); toast('נמחק');
+}
+
+let payFilter = 'open';
+function viewPayments(){
+  let list = DB.payments.slice();
+  if(payFilter === 'open') list = list.filter(p => p.status === 'pending');
+  if(payFilter === 'late') list = list.filter(p => payState(p) === 'late');
+  if(payFilter === 'paid') list = list.filter(p => p.status === 'paid');
+  list.sort((a,b) => {
+    const ka = a.status === 'paid' ? (a.paidDate||'') : (a.dueDate||'');
+    const kb = b.status === 'paid' ? (b.paidDate||'') : (b.dueDate||'');
+    return payFilter === 'paid' ? (ka < kb ? 1 : -1) : (ka < kb ? -1 : 1);
+  });
+  const sum = list.reduce((s,p) => s + (Number(p.amount)||0), 0);
+
+  let h = '<div class="btnbar" style="margin-bottom:12px">' +
+    '<button class="btn" onclick="editPayment()">＋ תשלום</button></div>';
+  h += '<div class="chips" style="margin-bottom:12px">' +
+    [['open','פתוחים'],['late','באיחור'],['paid','שולמו'],['all','הכל']].map(f =>
+      '<button class="chip' + (payFilter === f[0] ? ' on' : '') + '" onclick="payFilter=\'' + f[0] + '\';render()">' +
+      f[1] + '</button>').join('') + '</div>';
+  h += '<div class="card"><h2><span class="bar"></span>' + list.length + ' תשלומים · ' + money(sum) + '</h2>';
+  h += list.length ? list.map(payRow).join('') : '<div class="empty">אין תשלומים להצגה</div>';
+  h += '</div>';
+  return h;
+}
+
+/* ==================================================================
+   11. REPORTS
+   ================================================================== */
+function viewReports(){
+  const paid = DB.payments.filter(p => p.status === 'paid' && p.paidDate);
+
+  /* last 12 months of collected fees */
+  const months = [];
+  const now = new Date();
+  for(let i = 11; i >= 0; i--){
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push(d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'));
+  }
+  const byMonth = {};
+  months.forEach(k => byMonth[k] = 0);
+  paid.forEach(p => { const k = p.paidDate.slice(0,7); if(k in byMonth) byMonth[k] += Number(p.amount)||0; });
+  const max = Math.max(1, ...Object.values(byMonth));
+  const yearTotal = Object.values(byMonth).reduce((s,v) => s+v, 0);
+
+  let h = '<div class="card"><h2><span class="bar"></span>גבייה ב־12 החודשים האחרונים</h2>';
+  h += '<div class="kv"><span class="muted">סה״כ</span><b>' + money(yearTotal) + '</b></div>';
+  h += '<div class="bars" style="margin-top:12px">' + months.map(k => {
+    const v = byMonth[k];
+    const [y,mm] = k.split('-');
+    return '<div class="barrow"><div class="bl">' + mm + '/' + y.slice(2) + '</div>' +
+      '<div class="bt"><i style="width:' + Math.round(v / max * 100) + '%"></i></div>' +
+      '<div class="bv">' + (v ? money(v) : '—') + '</div></div>';
+  }).join('') + '</div></div>';
+
+  /* per-client standing */
+  const rows = DB.clients.map(c => {
+    const ms = clientMatters(c.id).filter(m => m.status !== 'cancelled');
+    const g = ms.reduce((s,m) => s + matterGross(m), 0);
+    const p = ms.reduce((s,m) => s + matterPaid(m.id), 0);
+    return {name:c.name, g, p, bal:g - p};
+  }).filter(r => r.g > 0).sort((a,b) => b.bal - a.bal);
+
+  h += '<div class="card"><h2><span class="bar"></span>לפי לקוח</h2>';
+  if(rows.length){
+    h += '<div style="overflow-x:auto"><table class="rep"><thead><tr>' +
+      '<th>לקוח</th><th>שכ״ט</th><th>נגבה</th><th>יתרה</th></tr></thead><tbody>' +
+      rows.map(r => '<tr><td>' + esc(r.name) + '</td><td>' + money(r.g) + '</td>' +
+        '<td style="color:var(--ok)">' + money(r.p) + '</td>' +
+        '<td style="color:' + (r.bal > 0.5 ? 'var(--bad)' : 'var(--ok)') + ';font-weight:700">' +
+        money(r.bal) + '</td></tr>').join('') +
+      '</tbody></table></div>';
+  } else h += '<div class="empty">אין נתונים</div>';
+  h += '</div>';
+
+  /* per matter type */
+  const byType = {};
+  activeMatters().forEach(m => {
+    const t = m.type || 'אחר';
+    if(!byType[t]) byType[t] = {g:0, p:0, n:0};
+    byType[t].g += matterGross(m); byType[t].p += matterPaid(m.id); byType[t].n++;
+  });
+  const tRows = Object.keys(byType).sort((a,b) => byType[b].g - byType[a].g);
+  h += '<div class="card"><h2><span class="bar"></span>לפי סוג תיק</h2>';
+  if(tRows.length){
+    h += '<div style="overflow-x:auto"><table class="rep"><thead><tr>' +
+      '<th>סוג</th><th>תיקים</th><th>שכ״ט</th><th>נגבה</th></tr></thead><tbody>' +
+      tRows.map(t => '<tr><td>' + esc(t) + '</td><td>' + byType[t].n + '</td>' +
+        '<td>' + money(byType[t].g) + '</td>' +
+        '<td style="color:var(--ok)">' + money(byType[t].p) + '</td></tr>').join('') +
+      '</tbody></table></div>';
+  } else h += '<div class="empty">אין נתונים</div>';
+  h += '</div>';
+
+  h += '<div class="card"><h2><span class="bar"></span>ייצוא</h2>' +
+    '<div class="btnbar"><button class="btn sm sec" onclick="exportCSV()">ייצוא תשלומים ל־CSV</button>' +
+    '<button class="btn sm sec" onclick="exportJSON()">גיבוי מלא (JSON)</button></div>' +
+    '<div class="hint">קובץ ה־CSV נפתח באקסל. הגיבוי המלא אינו מוצפן — שמרי אותו במקום בטוח.</div></div>';
+  return h;
+}
+
+function exportCSV(){
+  const head = ['לקוח','תיק','סוג','סכום','לתשלום עד','סטטוס','תאריך תשלום','אמצעי','מספר קבלה','הערה'];
+  const lines = [head.join(',')];
+  DB.payments.forEach(p => {
+    const m = matterById(p.matterId);
+    const cell = v => '"' + String(v == null ? '' : v).replace(/"/g,'""') + '"';
+    lines.push([clientName(m ? m.clientId : ''), m ? (m.title||'') : '', m ? (m.type||'') : '',
+                p.amount, p.dueDate || '', STATE_LABEL[payState(p)], p.paidDate || '',
+                p.method || '', p.receiptNo || '', p.notes || ''].map(cell).join(','));
+  });
+  download('﻿' + lines.join('\r\n'), 'shkar-tirha-' + todayKey() + '.csv', 'text/csv;charset=utf-8');
+}
+function exportJSON(){
+  download(JSON.stringify(DB, null, 2), 'fee-backup-' + todayKey() + '.json', 'application/json');
+}
+function download(text, name, type){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], {type}));
+  a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast('הקובץ ירד');
+}
+
+/* ==================================================================
+   12. SETTINGS
+   ================================================================== */
+function viewSettings(){
+  let h = '<div class="card"><h2><span class="bar"></span>סנכרון בין מכשירים</h2>';
+  h += syncUrl
+    ? '<div class="okbox">הסנכרון פעיל. הנתונים נשמרים בענן <b>מוצפנים</b> — בלי הסיסמה שלך אי אפשר לקרוא אותם.</div>'
+    : '<div class="warnbox">כרגע הנתונים נשמרים <b>רק במכשיר הזה</b>. כדי לראות אותם גם מהטלפון, הפעילי סנכרון.</div>';
+  h += fld('כתובת הסנכרון', '<input type="text" id="s_url" dir="ltr" placeholder="https://api.npoint.io/..." value="' + esc(syncUrl) + '">');
+  h += '<div class="btnbar"><button class="btn sm" onclick="saveSyncUrl()">שמירה</button>' +
+       (syncUrl ? '<button class="btn sm sec" onclick="pullNow()">משיכה מהענן עכשיו</button>' : '') + '</div>';
+  h += '<div class="hint" style="margin-top:10px"><b>איך יוצרים כתובת:</b><br>' +
+       '1. נכנסים ל־<a href="https://www.npoint.io" target="_blank" rel="noopener">npoint.io</a><br>' +
+       '2. מדביקים בתיבה את הטקסט <span dir="ltr">{}</span> ולוחצים Save<br>' +
+       '3. מעתיקים את הכתובת שמופיעה (מתחילה ב־<span dir="ltr">api.npoint.io</span>) ומדביקים כאן<br>' +
+       '4. באותו מכשיר שני — פותחים את האתר, מזינים את אותה כתובת ואותה סיסמה</div>';
+  h += '</div>';
+
+  h += '<div class="card"><h2><span class="bar"></span>מע״מ</h2>' +
+    fld('שיעור מע״מ (%)', '<input type="number" id="s_vat" step="0.1" value="' + (DB.settings.vatRate) + '">') +
+    '<button class="btn sm" onclick="saveVat()">שמירה</button>' +
+    '<div class="hint">משפיע על תיקים שסומנו "בתוספת מע״מ".</div></div>';
+
+  h += '<div class="card"><h2><span class="bar"></span>סיסמה</h2>' +
+    '<div class="hint" style="margin-bottom:10px">שינוי הסיסמה מצפין מחדש את כל הנתונים. ' +
+    'אם יש סנכרון — תצטרכי להזין את הסיסמה החדשה גם במכשירים האחרים.</div>' +
+    '<div class="btnbar"><button class="btn sm sec" onclick="changePassModal()">שינוי סיסמה</button>' +
+    '<button class="btn sm sec" onclick="lockNow()">נעילה</button></div></div>';
+
+  h += '<div class="card"><h2><span class="bar"></span>גיבוי ושחזור</h2>' +
+    '<div class="btnbar"><button class="btn sm sec" onclick="exportJSON()">הורדת גיבוי</button>' +
+    '<button class="btn sm sec" onclick="$(\'impFile\').click()">שחזור מגיבוי</button></div>' +
+    '<input type="file" id="impFile" accept=".json" class="hide" onchange="importJSON(this)">' +
+    '<div class="hint">מומלץ להוריד גיבוי פעם בחודש.</div></div>';
+
+  h += '<div class="card"><h2><span class="bar"></span>נתונים</h2>' +
+    '<div class="kv"><span class="muted">לקוחות</span><b>' + DB.clients.length + '</b></div>' +
+    '<div class="kv"><span class="muted">תיקים</span><b>' + DB.matters.length + '</b></div>' +
+    '<div class="kv"><span class="muted">תשלומים</span><b>' + DB.payments.length + '</b></div>' +
+    '<div class="kv"><span class="muted">עדכון אחרון</span><b>' +
+      new Date(DB.updatedAt).toLocaleString('he-IL') + '</b></div>' +
+    '<div class="btnbar" style="margin-top:12px">' +
+    '<button class="btn sm dang" onclick="wipe()">מחיקת כל הנתונים</button></div></div>';
+  return h;
+}
+async function saveSyncUrl(){
+  syncUrl = $('s_url').value.trim();
+  localStorage.setItem(LS_SYNC, syncUrl);
+  await save();
+  render();
+  toast(syncUrl ? 'סנכרון הופעל' : 'סנכרון בוטל');
+}
+async function pullNow(){
+  try{
+    const blob = await fetchRemote();
+    if(!blob) return toast('אין נתונים בענן');
+    const remote = await decryptDB(blob, KEY);
+    DB = remote;
+    localStorage.setItem(LS_BLOB, JSON.stringify(blob));
+    setSync('ok', '☁️ מסונכרן');
+    render(); toast('הנתונים עודכנו מהענן');
+  } catch(e){
+    toast(e.name === 'OperationError' ? 'הסיסמה בענן שונה' : 'שגיאה במשיכה');
+  }
+}
+async function saveVat(){
+  const v = Number($('s_vat').value);
+  if(!(v >= 0)) return toast('ערך לא תקין');
+  DB.settings.vatRate = v; await save(); render(); toast('נשמר');
+}
+function changePassModal(){
+  modal('שינוי סיסמה',
+    '<div class="warnbox">אם תשכחי את הסיסמה החדשה — לא תהיה דרך לשחזר את הנתונים. ' +
+    'מומלץ להוריד גיבוי לפני השינוי.</div>' +
+    fld('סיסמה חדשה', '<input type="password" id="np1">') +
+    fld('אימות', '<input type="password" id="np2">') +
+    '<button class="btn full" onclick="doChangePass()">שינוי</button>');
+}
+async function doChangePass(){
+  const a = $('np1').value, b = $('np2').value;
+  if(a.length < 4) return toast('סיסמה קצרה מדי');
+  if(a !== b) return toast('הסיסמאות אינן זהות');
+  SALT = crypto.getRandomValues(new Uint8Array(16));
+  KEY = await deriveKey(a, SALT);
+  if(localStorage.getItem(LS_PASS) !== null) localStorage.setItem(LS_PASS, a);
+  closeModal(); await save(); toast('הסיסמה שונתה');
+}
+function lockNow(){
+  localStorage.removeItem(LS_PASS);
+  location.reload();
+}
+async function importJSON(input){
+  const f = input.files[0]; if(!f) return;
+  try{
+    const obj = JSON.parse(await f.text());
+    if(!obj || !Array.isArray(obj.clients)) throw new Error('bad');
+    if(!confirm('השחזור יחליף את כל הנתונים הקיימים. להמשיך?')) return;
+    DB = Object.assign(freshDB(), obj);
+    await save(); go('dash'); toast('שוחזר בהצלחה');
+  } catch(e){ toast('קובץ לא תקין'); }
+  input.value = '';
+}
+async function wipe(){
+  if(!confirm('פעולה זו תמחק את כל הלקוחות, התיקים והתשלומים. להמשיך?')) return;
+  if(!confirm('בטוחה? אין דרך חזרה (אלא אם יש לך גיבוי).')) return;
+  DB = freshDB();
+  await save(); go('dash'); toast('הכל נמחק');
+}
+
+/* ==================================================================
+   13. MODAL HELPERS
+   ================================================================== */
+function fld(label, inner){
+  return '<div class="fld"><label>' + label + '</label>' + inner + '</div>';
+}
+function modal(title, body){
+  $('modalHost').innerHTML =
+    '<div class="modal" onclick="if(event.target===this)closeModal()"><div class="modal-in">' +
+    '<div class="modal-h"><h3>' + esc(title) + '</h3><button class="x" onclick="closeModal()">×</button></div>' +
+    body + '</div></div>';
+}
+function closeModal(){ $('modalHost').innerHTML = ''; }
+
+/* ==================================================================
+   14. UNLOCK FLOW
+   ================================================================== */
+let mode = 'unlock';   // 'setup' when no data exists yet
+let bootBlob = null;
+
+async function boot(){
+  syncUrl = localStorage.getItem(LS_SYNC) || '';
+
+  /* prefer whichever copy is newer once decrypted; start from local */
+  bootBlob = localBlob();
+  if(syncUrl){
+    try{
+      const remote = await fetchRemote();
+      if(remote) bootBlob = remote;
+    } catch(e){ /* offline — fall back to the local copy */ }
+  }
+
+  mode = bootBlob ? 'unlock' : 'setup';
+  $('lockSub').innerHTML = mode === 'setup'
+    ? 'ברוכה הבאה. בחרי סיסמה שתגן על הנתונים.<br>הנתונים מוצפנים — רק הסיסמה הזו פותחת אותם.'
+    : 'הזיני את הסיסמה שלך';
+  $('pass2').classList.toggle('hide', mode !== 'setup');
+  $('lockGo').textContent = mode === 'setup' ? 'יצירת המערכת' : 'כניסה';
+  $('lockNote').innerHTML = mode === 'setup'
+    ? '<b>חשוב לדעת:</b> אין "שכחתי סיסמה". הסיסמה לא נשמרת בשום שרת, ולכן אם היא תאבד — הנתונים לא ניתנים לשחזור. רשמי אותה במקום בטוח.'
+    : '';
+  $('lockForm').classList.remove('hide');
+
+  const saved = localStorage.getItem(LS_PASS);
+  if(saved && mode === 'unlock'){
+    $('remember').checked = true;
+    $('pass1').value = saved;
+    tryUnlock(true);
+  } else {
+    $('pass1').focus();
+  }
+}
+
+async function tryUnlock(silent){
+  const p1 = $('pass1').value;
+  const err = $('lockErr');
+  err.textContent = '';
+
+  if(mode === 'setup'){
+    if(p1.length < 4) return err.textContent = 'הסיסמה צריכה להיות באורך 4 תווים לפחות';
+    if(p1 !== $('pass2').value) return err.textContent = 'הסיסמאות אינן זהות';
+    SALT = crypto.getRandomValues(new Uint8Array(16));
+    KEY = await deriveKey(p1, SALT);
+    DB = freshDB();
+    if($('remember').checked) localStorage.setItem(LS_PASS, p1);
+    await save();
+    return enterApp();
+  }
+
+  if(!p1) return err.textContent = 'הזיני סיסמה';
+  $('lockGo').disabled = true;
+  $('lockGo').textContent = 'פותח…';
+  try{
+    SALT = unb64(bootBlob.salt);
+    KEY = await deriveKey(p1, SALT);
+    DB = await decryptDB(bootBlob, KEY);
+
+    /* keep whichever copy is newer when both exist */
+    const local = localBlob();
+    if(local && local !== bootBlob){
+      try{
+        const lDB = await decryptDB(local, KEY);
+        if(lDB.updatedAt > DB.updatedAt){ DB = lDB; dirty = true; }
+      } catch(e){ /* local encrypted with an older password — ignore it */ }
+    }
+
+    DB = Object.assign(freshDB(), DB);
+    if(!DB.settings) DB.settings = {vatRate:18};
+    if($('remember').checked) localStorage.setItem(LS_PASS, p1);
+    else localStorage.removeItem(LS_PASS);
+    localStorage.setItem(LS_BLOB, JSON.stringify(bootBlob));
+    enterApp();
+    if(dirty) save();
+  } catch(e){
+    localStorage.removeItem(LS_PASS);
+    err.textContent = 'סיסמה שגויה';
+    $('pass1').value = '';
+    if(!silent) $('pass1').focus();
+  }
+  $('lockGo').disabled = false;
+  $('lockGo').textContent = mode === 'setup' ? 'יצירת המערכת' : 'כניסה';
+}
+
+function enterApp(){
+  $('lock').classList.add('hide');
+  $('app').classList.remove('hide');
+  setSync(syncUrl ? 'ok' : '', syncUrl ? '☁️ מסונכרן' : '💾 מקומי — הפעילי סנכרון בהגדרות');
+  go('dash');
+}
+
+$('lockGo').onclick = () => tryUnlock(false);
+['pass1','pass2'].forEach(id => $(id).addEventListener('keydown', e => {
+  if(e.key === 'Enter') tryUnlock(false);
+}));
+
+boot();
+</script>
+</body>
+</html>
