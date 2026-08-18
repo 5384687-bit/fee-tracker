@@ -46,7 +46,11 @@ header h1{margin:0;font-size:17px;font-weight:600}
 header h1 span{color:var(--gold)}
 .hbtn{color:#fff;opacity:.75;font-size:19px;padding:2px 6px}
 .sync{font-size:11px;padding:5px 10px;border-radius:20px;background:rgba(255,255,255,.14);
-  margin-top:9px;display:inline-block}
+  margin-top:9px;display:inline-block;color:#fff;font-family:inherit}
+.syncbanner{background:linear-gradient(135deg,#fff8ed,#fff);border:1.5px solid #f0c896;
+  border-radius:14px;padding:14px;margin-bottom:13px;box-shadow:var(--shadow)}
+.syncbanner .t{font-weight:700;font-size:14px;margin-bottom:4px}
+.syncbanner .d{font-size:12.5px;color:var(--ink2);line-height:1.6;margin-bottom:11px}
 .sync.ok{background:rgba(16,185,129,.28)}
 .sync.err{background:rgba(239,68,68,.32)}
 .sync.warn{background:rgba(245,158,11,.32)}
@@ -217,7 +221,7 @@ table.rep tr:last-child td{border-bottom:none}
     <h1>מעקב <span>שכר טרחה</span></h1>
     <button class="hbtn" onclick="go('settings')" title="הגדרות">⚙️</button>
   </div>
-  <div class="sync" id="syncStatus">☁️ מקומי בלבד</div>
+  <button class="sync" id="syncStatus" onclick="go('settings')">☁️ מקומי בלבד</button>
 </header>
 
 <main id="view"></main>
@@ -241,6 +245,7 @@ table.rep tr:last-child td{border-bottom:none}
    ================================================================== */
 const LS_BLOB = 'ft_blob', LS_SYNC = 'ft_sync', LS_PASS = 'ft_pass';
 const PBKDF2_ITER = 250000;
+const APP_VERSION = '2026.08.19';
 /* quick-pick phrases for the free-text content field */
 const QUICK_TEXTS = ['התקבל תשלום','נשלחה דרישת תשלום','שיחה עם הלקוח','נשלח מייל','נחתם הסכם שכ״ט','הוגשה חשבונית'];
 
@@ -352,7 +357,7 @@ async function save(){
   const blob = await encryptDB(DB, KEY, SALT);
   try { localStorage.setItem(LS_BLOB, JSON.stringify(blob)); }
   catch(e){ toast('שגיאה בשמירה מקומית'); }
-  if(!syncUrl){ setSync('', '💾 נשמר במכשיר הזה'); return; }
+  if(!syncUrl){ setSync('', '💾 מקומי בלבד — הקישי להפעלת סנכרון'); return; }
   setSync('warn', '☁️ מסנכרן…');
   try { await pushRemote(blob); dirty = false; setSync('ok', '☁️ מסונכרן'); }
   catch(e){ dirty = true; setSync('err', '⚠️ אין חיבור — נשמר במכשיר, יסונכרן בהמשך'); }
@@ -476,6 +481,15 @@ function viewList(){
     stat('שולם', money(paid), 'g') +
     stat('יתרה', money(total - paid), total - paid > 0.5 ? 'r' : 'g') +
   '</div>';
+
+  /* Sync is the one setup step that matters — offer it here, not buried in settings. */
+  if(!syncUrl){
+    h += '<div class="syncbanner">' +
+      '<div class="t">📱 הנתונים כרגע רק במחשב הזה</div>' +
+      '<div class="d">לחיצה אחת ויהיו זמינים גם מהטלפון ומכל מחשב אחר, ' +
+      'ומשם זה אוטומטי לגמרי.</div>' +
+      '<button class="btn full" data-syncbtn onclick="createBin()">🔗 הפעלת סנכרון</button></div>';
+  }
 
   const due = dueReminders();
   if(due.length){
@@ -839,7 +853,7 @@ function viewSettings(){
   if(!syncUrl){
     h += '<div class="warnbox">כרגע הנתונים נשמרים <b>רק במכשיר הזה</b>.<br>' +
          'לחיצה אחת מפעילה סנכרון — ומכאן זה אוטומטי לגמרי, בלי לעשות שום דבר בכל פעם.</div>' +
-         '<button class="btn full" id="syncBtn" onclick="createBin()">🔗 הפעלת סנכרון</button>';
+         '<button class="btn full" data-syncbtn onclick="createBin()">🔗 הפעלת סנכרון</button>';
   } else {
     h += '<div class="okbox">✓ הסנכרון פעיל. כל שינוי נשמר בענן לבד, <b>מוצפן</b> — ' +
          'בלי הסיסמה שלך אי אפשר לקרוא אותו.</div>';
@@ -882,6 +896,7 @@ function viewSettings(){
     '<div class="kv"><span class="muted">שורות ביומן</span><b>' + DB.entries.length + '</b></div>' +
     '<div class="kv"><span class="muted">עדכון אחרון</span><b>' +
       new Date(DB.updatedAt).toLocaleString('he-IL') + '</b></div>' +
+    '<div class="kv"><span class="muted">גרסת התוכנה</span><b>' + APP_VERSION + '</b></div>' +
     '<div class="btnbar" style="margin-top:12px">' +
     '<button class="btn sm dang" onclick="wipe()">מחיקת כל הנתונים</button></div></div>';
   return h;
@@ -892,8 +907,9 @@ function syncLink(){
 }
 /** Create the cloud store from inside the app — no external site, no account. */
 async function createBin(){
-  const btn = $('syncBtn');
-  if(btn){ btn.disabled = true; btn.textContent = 'מפעיל…'; }
+  /* the button lives in two places — the main-screen banner and settings */
+  const btns = [...document.querySelectorAll('[data-syncbtn]')];
+  btns.forEach(b => { b.disabled = true; b.textContent = 'מפעיל…'; });
   try{
     const r = await fetch('https://www.npoint.io/documents', {
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -907,7 +923,7 @@ async function createBin(){
     render();
     toast('הסנכרון הופעל ✓');
   } catch(e){
-    if(btn){ btn.disabled = false; btn.textContent = '🔗 הפעלת סנכרון'; }
+    btns.forEach(b => { b.disabled = false; b.textContent = '🔗 הפעלת סנכרון'; });
     toast('לא הצלחתי להפעיל — בדקי חיבור לאינטרנט');
   }
 }
@@ -1110,7 +1126,7 @@ async function tryUnlock(silent){
 function enterApp(){
   $('lock').classList.add('hide');
   $('app').classList.remove('hide');
-  setSync(syncUrl ? 'ok' : '', syncUrl ? '☁️ מסונכרן' : '💾 מקומי — הפעילי סנכרון בהגדרות');
+  setSync(syncUrl ? 'ok' : '', syncUrl ? '☁️ מסונכרן' : '💾 מקומי בלבד — הקישי להפעלת סנכרון');
   go('list');
   const due = dueReminders();
   if(due.length && DB.settings.notify && 'Notification' in window && Notification.permission === 'granted'){
