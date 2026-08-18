@@ -294,6 +294,33 @@ table.rep tr:last-child td{border-bottom:none}
 .barrow .bt i{display:block;height:100%;border-radius:8px;
   background:linear-gradient(90deg,var(--brand),#7387cc)}
 .barrow .bv{width:78px;text-align:left;font-weight:700;white-space:nowrap}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+@media(min-width:560px){.tiles{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:820px){.tiles{grid-template-columns:repeat(4,1fr)}}
+.tile{position:relative;overflow:hidden;background:#fff;border:1.5px solid var(--line);
+  border-radius:18px;padding:14px 13px;box-shadow:var(--sh-s);transition:.16s}
+.tile.tap{cursor:pointer}
+.tile.tap:hover{border-color:#cfd6ee;transform:translateY(-2px);box-shadow:var(--sh-m)}
+.tile.tap:active{transform:translateY(0) scale(.985)}
+.tile .tname{font-size:18px;font-weight:800;line-height:1.3;word-break:break-word;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tile .tamt{font-size:23px;font-weight:800;margin-top:9px;letter-spacing:-.5px;line-height:1.1}
+.tile .tsub{font-size:14px;color:var(--ink3);margin-top:3px;font-weight:600}
+.tile.done{background:linear-gradient(165deg,#f2fbf7,#fff);border-color:#c7ecdb}
+.tile.due{border-color:#f0b3bd;background:linear-gradient(165deg,#fff6f7,#fff)}
+.tile .bell{position:absolute;top:11px;left:11px;font-size:16px}
+.tile .tbar{height:7px;background:#eef0f8;border-radius:5px;overflow:hidden;margin-top:10px}
+.tile .tbar i{display:block;height:100%;border-radius:5px;
+  background:linear-gradient(90deg,#12a06a,#4bd39b);transition:width .35s ease}
+.tile .mv{display:flex;gap:7px;margin-top:11px}
+.tile .mv button{flex:1;padding:9px 0;border-radius:11px;background:#f1f3fa;
+  font-size:16px;font-weight:800;color:var(--ink2);transition:.15s}
+.tile .mv button:hover:not(:disabled){background:var(--brand-lt);color:var(--brand)}
+.tile .mv button:disabled{opacity:.32;cursor:default}
+.tile .pos{position:absolute;top:11px;right:13px;font-size:14px;font-weight:800;color:var(--ink3)}
+.reorderbar{display:flex;align-items:center;gap:9px;background:var(--brand-lt);
+  border:1.5px solid #d5ddf5;border-radius:15px;padding:12px 14px;margin-bottom:13px;
+  font-size:14px;color:var(--brand);font-weight:700;line-height:1.5}
 .syncbanner{background:linear-gradient(150deg,#fff8ec,#fff);border:2px solid #f4dfb8;
   border-radius:var(--r-l);padding:18px;margin-bottom:15px;box-shadow:var(--sh-s)}
 .syncbanner .t{font-weight:800;font-size:18px;margin-bottom:6px}
@@ -351,7 +378,7 @@ table.rep tr:last-child td{border-bottom:none}
    ================================================================== */
 const LS_BLOB = 'ft_blob', LS_SYNC = 'ft_sync', LS_PASS = 'ft_pass';
 const PBKDF2_ITER = 250000;
-const APP_VERSION = '2026.08.19c';
+const APP_VERSION = '2026.08.19d';
 /* quick-pick phrases for the free-text content field */
 const QUICK_TEXTS = ['התקבל תשלום','נשלחה דרישת תשלום','שיחה עם הלקוח','נשלח מייל','נחתם הסכם שכ״ט','הוגשה חשבונית'];
 
@@ -460,6 +487,7 @@ function setSync(state, text){
 /** A card closes itself the moment nothing is owed on it, and reopens if the
     amount is later raised. Returns the names that closed on this pass. */
 function applyAutoClose(){
+  normalizeOrder();
   const justClosed = [];
   DB.payments.forEach(p => {
     const amt = Number(p.amount) || 0;
@@ -554,6 +582,34 @@ function migrate(db){
    6. DOMAIN
    ================================================================== */
 const payById = id => DB.payments.find(p => p.id === id);
+
+/** Give every card a place in the manual order, seeding from the old
+    balance-first arrangement the first time so nothing jumps around. */
+function normalizeOrder(){
+  if(DB.payments.every(p => typeof p.order === 'number')) return;
+  DB.payments.slice()
+    .sort((a,b) => balanceOf(b) - balanceOf(a))
+    .forEach((p,i) => { p.order = i; });
+}
+/** The cards currently on screen, in the order they are drawn. */
+function visiblePayments(){
+  let list = DB.payments.slice();
+  if(listFilter === 'open') list = list.filter(p => !p.closed);
+  if(listFilter === 'paid') list = list.filter(p => p.closed);
+  const q = listQ.trim();
+  if(q) list = list.filter(p => (p.name + ' ' + (p.phone||'')).includes(q));
+  return list.sort((a,b) => (a.order||0) - (b.order||0));
+}
+/** Swap a card with its neighbour on screen, so filters and search stay honest. */
+async function movePayment(id, dir){
+  const vis = visiblePayments();
+  const i = vis.findIndex(p => p.id === id);
+  const j = i + dir;
+  if(i < 0 || j < 0 || j >= vis.length) return;
+  const t = vis[i].order; vis[i].order = vis[j].order; vis[j].order = t;
+  await save();
+  render();
+}
 const payName = id => { const p = payById(id); return p ? p.name : '—'; };
 
 const payEntries = id => DB.entries.filter(e => e.paymentId === id)
@@ -605,7 +661,8 @@ function render(){
 /* ==================================================================
    8. MAIN LIST — everything revolves around payments
    ================================================================== */
-let listQ = '', listFilter = 'open';
+let listQ = '', listFilter = 'open', reorderMode = false;
+function toggleReorder(){ reorderMode = !reorderMode; render(); }
 function viewList(){
   const openPays = DB.payments.filter(p => !p.closed);
   const openBalance = openPays.reduce((s,p) => s + Math.max(0, balanceOf(p)), 0);
@@ -651,36 +708,51 @@ function viewList(){
   h += '<div class="chips" style="margin-bottom:12px">' +
     [['open','פתוחים'],['paid','נסגרו'],['all','הכל']].map(f =>
       '<button class="chip' + (listFilter === f[0] ? ' on' : '') +
-      '" onclick="listFilter=\'' + f[0] + '\';render()">' + f[1] + '</button>').join('') + '</div>';
-  h += '<div class="search"><input type="text" id="lq" placeholder="חיפוש לפי שם או טלפון" value="' +
-       esc(listQ) + '" oninput="listQ=this.value;renderList()"></div>';
+      '" onclick="listFilter=\'' + f[0] + '\';render()">' + f[1] + '</button>' ).join('') +
+    (DB.payments.length > 1
+      ? '<button class="chip' + (reorderMode ? ' on' : '') + '" onclick="toggleReorder()">⇅ סידור</button>'
+      : '') + '</div>';
+  if(reorderMode){
+    h += '<div class="reorderbar"><span style="font-size:20px">⇅</span>' +
+      '<span>מצב סידור — הזיזי כרטיסים לפי מה שדחוף לך</span></div>';
+  } else {
+    h += '<div class="search"><input type="text" id="lq" placeholder="חיפוש לפי שם או טלפון" value="' +
+         esc(listQ) + '" oninput="listQ=this.value;renderList()"></div>';
+  }
   h += '<div id="payList">' + listHTML() + '</div>';
   return h;
 }
 function renderList(){ $('payList').innerHTML = listHTML(); }
 function listHTML(){
-  let list = DB.payments.slice();
-  if(listFilter === 'open') list = list.filter(p => !p.closed);
-  if(listFilter === 'paid') list = list.filter(p => p.closed);
-  const q = listQ.trim();
-  if(q) list = list.filter(p => (p.name + ' ' + (p.phone||'')).includes(q));
-  list.sort((a,b) => balanceOf(b) - balanceOf(a));
+  const list = visiblePayments();
   if(!list.length) return '<div class="card"><div class="empty">אין תשלומים להצגה</div></div>';
+  const last = list.length - 1;
 
-  return '<div class="card">' + list.map(p => {
+  return '<div class="tiles">' + list.map((p, i) => {
     const amt = Number(p.amount) || 0, pd = paidOf(p.id), bal = amt - pd;
     const pct = amt > 0 ? Math.min(100, Math.round(pd / amt * 100)) : 0;
     const hasDue = DB.entries.some(e => e.paymentId === p.id && e.reminderAt &&
                                         !e.reminderDone && daysUntil(e.reminderAt) <= 0);
-    return '<div class="row clickable" onclick="go(\'pay\',\'' + p.id + '\')">' +
-      '<div class="grow"><div class="nm">' + esc(p.name) +
-        (hasDue ? ' <span class="badge b-late">🔔</span>' : '') +
-        (p.closed ? ' <span class="badge b-ok">✓ נסגר</span>' : '') + '</div>' +
-      '<div class="meta">' + (p.phone ? esc(p.phone) + ' · ' : '') +
-        money(amt) + (pd > 0 ? ' · שולם ' + pct + '%' : '') + '</div>' +
-      (pd > 0 && bal > 0.5 ? '<div class="progbar"><i style="width:' + pct + '%"></i></div>' : '') + '</div>' +
-      '<div class="amt" style="color:' + (bal > 0.5 ? 'var(--bad)' : 'var(--ok)') + '">' +
-      (bal > 0.5 ? money(bal) : '✓ שולם') + '</div></div>';
+    let h = '<div class="tile' + (p.closed ? ' done' : '') + (hasDue ? ' due' : '') +
+      (reorderMode ? '' : ' tap') + '"' +
+      (reorderMode ? '' : ' onclick="go(\'pay\',\'' + p.id + '\')"') + '>';
+    if(reorderMode) h += '<div class="pos">' + (i + 1) + '</div>';
+    else if(hasDue) h += '<div class="bell">🔔</div>';
+    h += '<div class="tname">' + esc(p.name) + '</div>';
+    h += '<div class="tamt" style="color:' + (bal > 0.5 ? 'var(--bad)' : 'var(--ok)') + '">' +
+      (bal > 0.5 ? money(bal) : '✓') + '</div>';
+    h += '<div class="tsub">' + (bal > 0.5
+      ? (pd > 0 ? 'מתוך ' + money(amt) : 'לגבייה')
+      : 'שולם במלואו') + '</div>';
+    if(pd > 0 && bal > 0.5) h += '<div class="tbar"><i style="width:' + pct + '%"></i></div>';
+    if(reorderMode){
+      h += '<div class="mv">' +
+        '<button onclick="movePayment(\'' + p.id + '\',-1)"' + (i === 0 ? ' disabled' : '') +
+          ' title="הקדם">↑</button>' +
+        '<button onclick="movePayment(\'' + p.id + '\',1)"' + (i === last ? ' disabled' : '') +
+          ' title="אחר">↓</button></div>';
+    }
+    return h + '</div>';
   }).join('') + '</div>';
 }
 function remRow(e){
@@ -726,7 +798,12 @@ async function savePayment(id){
   const data = {name, phone:$('p_phone').value.trim(), amount, notes:$('p_notes').value.trim()};
   let newId = id;
   if(id) Object.assign(payById(id), data);
-  else { newId = uid(); DB.payments.push(Object.assign({id:newId, createdAt:todayKey()}, data)); }
+  else {
+    newId = uid();
+    normalizeOrder();
+    const first = DB.payments.reduce((m,p) => Math.min(m, p.order || 0), 0);
+    DB.payments.push(Object.assign({id:newId, createdAt:todayKey(), order:first - 1}, data));
+  }
   closeModal();
   const closed = await save();
   if(id) render(); else go('pay', newId);
