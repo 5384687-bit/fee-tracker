@@ -62,23 +62,23 @@ main{max-width:960px;margin:0 auto;padding:15px 13px 20px}
 .muted{color:var(--ink2)}
 .empty{text-align:center;color:var(--ink3);padding:24px 10px;font-size:13.5px}
 
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:13px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px;box-shadow:var(--shadow)}
-.stat .lbl{font-size:11.5px;color:var(--ink2);margin-bottom:4px}
-.stat .val{font-size:19px;font-weight:700;letter-spacing:-.3px}
-.stat.g .val{color:var(--ok)} .stat.r .val{color:var(--bad)} .stat.o .val{color:var(--warn)}
-@media(min-width:700px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:13px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 10px;
+  box-shadow:var(--shadow);text-align:center}
+.stat .lbl{font-size:11px;color:var(--ink2);margin-bottom:4px}
+.stat .val{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.stat.g .val{color:var(--ok)} .stat.r .val{color:var(--bad)}
 
-.row{display:flex;align-items:flex-start;gap:11px;padding:11px 8px;border-bottom:1px solid var(--line)}
+.row{display:flex;align-items:flex-start;gap:11px;padding:12px 8px;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:none}
 .row .grow{flex:1;min-width:0}
-.row .nm{font-weight:600;font-size:14.5px}
+.row .nm{font-weight:600;font-size:15px}
 .row .meta{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.55}
-.row .amt{font-weight:700;white-space:nowrap;font-size:14.5px;text-align:left}
+.row .amt{font-weight:700;white-space:nowrap;font-size:15px;text-align:left}
 .clickable{cursor:pointer;border-radius:10px;transition:background .12s}
 .clickable:active,.clickable:hover{background:#f8fafc}
+.tel{color:var(--brand2);text-decoration:none}
 
-/* ---- timeline of log entries ---- */
 .tl{position:relative;padding-right:22px}
 .tl:before{content:'';position:absolute;top:6px;bottom:6px;right:6px;width:2px;background:var(--line)}
 .ent{position:relative;padding:11px 12px 11px 8px;margin-bottom:9px;background:#fff;
@@ -94,14 +94,13 @@ main{max-width:960px;margin:0 auto;padding:15px 13px 20px}
 .ent .rembox{margin-top:7px;font-size:11.5px;background:var(--warnbg);color:#8a5a08;
   border-radius:8px;padding:5px 9px;display:inline-flex;align-items:center;gap:5px}
 .ent .rembox.due{background:var(--badbg);color:var(--bad);font-weight:600}
-.ent .acts{margin-top:8px;display:flex;gap:6px}
+.ent .acts{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
 .ent .acts button{font-size:11.5px;color:var(--ink3);padding:3px 8px;border-radius:7px;background:#f6f8fa}
 .ent .acts button:hover{color:var(--brand2)}
 .ent .acts button.dl:hover{color:var(--bad)}
 
 .badge{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
 .b-ok{background:var(--okbg);color:var(--ok)}
-.b-n{background:#eef2f7;color:var(--ink2)}
 .b-late{background:var(--badbg);color:var(--bad)}
 .b-soon{background:var(--warnbg);color:var(--warn)}
 
@@ -113,18 +112,19 @@ main{max-width:960px;margin:0 auto;padding:15px 13px 20px}
 .btn.dang{background:var(--badbg);color:var(--bad)}
 .btn.sm{padding:7px 12px;font-size:12.5px;border-radius:9px}
 .btn.full{width:100%}
-.btn:disabled{opacity:.45;cursor:default}
 .btnbar{display:flex;gap:8px;flex-wrap:wrap}
+.fab{position:fixed;bottom:90px;left:16px;z-index:25;padding:14px 20px;border-radius:30px;
+  background:var(--brand);color:#fff;font-weight:700;font-size:14.5px;
+  box-shadow:0 6px 20px rgba(30,58,95,.4)}
 
 label{display:block;font-size:12.5px;font-weight:600;color:var(--ink2);margin:0 0 5px}
 .fld{margin-bottom:12px}
-input[type=text],input[type=number],input[type=date],input[type=tel],input[type=email],
-input[type=password],select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--line);
+input[type=text],input[type=number],input[type=date],input[type=tel],
+input[type=password],select,textarea{width:100%;padding:11px 12px;border:1.5px solid var(--line);
   border-radius:10px;background:#fff;transition:border-color .12s}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand2)}
 textarea{resize:vertical;min-height:66px}
-input[type=date],input[type=number]{direction:ltr;text-align:right}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input[type=date],input[type=number],input[type=tel]{direction:ltr;text-align:right}
 .chips{display:flex;gap:7px;flex-wrap:wrap}
 .chip{padding:8px 13px;border-radius:20px;border:1.5px solid var(--line);background:#fff;font-size:13px;font-weight:500}
 .chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
@@ -146,11 +146,11 @@ input[type=date],input[type=number]{direction:ltr;text-align:right}
 
 nav{position:fixed;bottom:0;right:0;left:0;background:#fff;border-top:1px solid var(--line);
   display:flex;z-index:30;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 12px rgba(15,23,42,.06)}
-nav button{flex:1;padding:9px 2px 8px;font-size:10.5px;color:var(--ink3);
+nav button{flex:1;padding:9px 2px 8px;font-size:11px;color:var(--ink3);
   display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:600;position:relative}
-nav button .ic{font-size:18px;line-height:1}
+nav button .ic{font-size:19px;line-height:1}
 nav button.on{color:var(--brand)}
-nav .dot{position:absolute;top:6px;left:50%;margin-left:7px;width:8px;height:8px;
+nav .dot{position:absolute;top:6px;left:50%;margin-left:9px;width:8px;height:8px;
   border-radius:50%;background:var(--bad)}
 
 .search{margin-bottom:12px}
@@ -169,16 +169,15 @@ nav .dot{position:absolute;top:6px;left:50%;margin-left:7px;width:8px;height:8px
 .okbox{background:var(--okbg);border:1px solid #b6e2c8;border-radius:11px;padding:11px 12px;
   font-size:12.5px;color:#0b6b3d;line-height:1.65;margin-bottom:12px}
 .back{font-size:13px;color:var(--brand2);font-weight:600;margin-bottom:10px;display:inline-block}
-.feehead{background:linear-gradient(135deg,#1e3a5f,#2c5282);color:#fff;border-radius:14px;
+.head{background:linear-gradient(135deg,#1e3a5f,#2c5282);color:#fff;border-radius:14px;
   padding:16px;margin-bottom:13px;box-shadow:var(--shadow)}
-.feehead .nm{font-size:19px;font-weight:700}
-.feehead .ph{font-size:12.5px;opacity:.7;margin-top:2px}
-.feehead .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
-.feehead .g3 div{background:rgba(255,255,255,.12);border-radius:10px;padding:9px 8px;text-align:center}
-.feehead .g3 .l{font-size:10.5px;opacity:.75}
-.feehead .g3 .v{font-size:15px;font-weight:700;margin-top:2px}
-.feehead .nofee{background:rgba(255,255,255,.12);border-radius:10px;padding:11px;
-  text-align:center;font-size:13px;margin-top:12px}
+.head .nm{font-size:20px;font-weight:700}
+.head .ph{font-size:13px;margin-top:3px}
+.head .ph a{color:#fff;opacity:.85;text-decoration:none;border-bottom:1px dotted rgba(255,255,255,.5)}
+.head .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.head .g3 div{background:rgba(255,255,255,.12);border-radius:10px;padding:9px 8px;text-align:center}
+.head .g3 .l{font-size:10.5px;opacity:.75}
+.head .g3 .v{font-size:15px;font-weight:700;margin-top:2px}
 table.rep{width:100%;border-collapse:collapse;font-size:13px}
 table.rep th{text-align:right;font-size:11.5px;color:var(--ink2);padding:7px 6px;border-bottom:1.5px solid var(--line)}
 table.rep td{padding:8px 6px;border-bottom:1px solid var(--line)}
@@ -222,12 +221,11 @@ table.rep tr:last-child td{border-bottom:none}
 </header>
 
 <main id="view"></main>
+<button class="fab hide" id="fab" onclick="editPayment()">＋ תשלום חדש</button>
 
 <nav>
-  <button data-nav="dash"      onclick="go('dash')"><span class="ic">📊</span>דשבורד</button>
-  <button data-nav="clients"   onclick="go('clients')"><span class="ic">👤</span>לקוחות</button>
+  <button data-nav="list"      onclick="go('list')"><span class="ic">💰</span>תשלומים</button>
   <button data-nav="reminders" onclick="go('reminders')"><span class="ic">🔔</span>תזכורות</button>
-  <button data-nav="ledger"    onclick="go('ledger')"><span class="ic">💰</span>תקבולים</button>
   <button data-nav="reports"   onclick="go('reports')"><span class="ic">📈</span>דוחות</button>
 </nav>
 </div>
@@ -243,12 +241,11 @@ table.rep tr:last-child td{border-bottom:none}
    ================================================================== */
 const LS_BLOB = 'ft_blob', LS_SYNC = 'ft_sync', LS_PASS = 'ft_pass';
 const PBKDF2_ITER = 250000;
-const VAT_MODES = {plus:'בתוספת מע״מ', included:'כולל מע״מ', none:'ללא מע״מ'};
-/* quick-pick suggestions for the free-text content field */
+/* quick-pick phrases for the free-text content field */
 const QUICK_TEXTS = ['התקבל תשלום','נשלחה דרישת תשלום','שיחה עם הלקוח','נשלח מייל','נחתם הסכם שכ״ט','הוגשה חשבונית'];
 
 let DB = null, KEY = null, SALT = null;
-let screen = 'dash', curClient = null;
+let screen = 'list', curPay = null;
 let syncUrl = '', dirty = false;
 
 /* ==================================================================
@@ -325,9 +322,8 @@ const isBlob = b => b && b.ft === 1 && b.ct && b.iv && b.salt;
    4. STORAGE + SYNC
    ================================================================== */
 function freshDB(){
-  return {v:2, updatedAt:new Date().toISOString(),
-          settings:{vatRate:18, notify:false},
-          clients:[], entries:[]};
+  return {v:3, updatedAt:new Date().toISOString(),
+          settings:{notify:false}, payments:[], entries:[]};
 }
 function localBlob(){
   try { return JSON.parse(localStorage.getItem(LS_BLOB)); } catch(e){ return null; }
@@ -365,64 +361,73 @@ setInterval(() => { if(dirty && syncUrl && navigator.onLine) save(); }, 30000);
 window.addEventListener('online', () => { if(dirty) save(); });
 
 /* ==================================================================
-   5. MIGRATION  (v1 matters/payments  ->  v2 client fee + entries)
+   5. MIGRATION  ->  v3 (one flat list of payments)
    ================================================================== */
 function migrate(db){
-  if(!db || db.v === 2) return db;
+  if(!db || db.v === 3) return db;
   const out = freshDB();
-  out.settings = Object.assign(out.settings, db.settings || {});
-  out.clients = (db.clients || []).map(c => Object.assign({}, c, {feeAmount:0, vatMode:'plus'}));
+  out.settings.notify = !!(db.settings && db.settings.notify);
+  const rate = ((db.settings && db.settings.vatRate != null) ? db.settings.vatRate : 18) / 100;
 
-  /* an old client could hold several matters — their fees add up into one balance */
-  (db.matters || []).forEach(m => {
-    const c = out.clients.find(x => x.id === m.clientId);
-    if(!c) return;
-    const base = Number(m.feeAmount) || 0;
-    const rate = (out.settings.vatRate != null ? out.settings.vatRate : 18) / 100;
-    c.feeAmount += (m.vatMode === 'plus' ? base * (1 + rate) : base);
-    c.vatMode = 'included';                       // the sum above already carries VAT
-    if(m.title) c.notes = ((c.notes ? c.notes + '\n' : '') + m.title).trim();
+  if(db.v === 2){
+    /* v2: clients carrying a fee + entries keyed by clientId */
+    out.payments = (db.clients || []).map(c => ({
+      id: c.id, name: c.name, phone: c.phone || '',
+      /* fold VAT into a single final amount — v3 has no separate VAT field */
+      amount: Math.round((c.vatMode === 'plus' ? (Number(c.feeAmount)||0) * (1 + rate)
+                                               : (Number(c.feeAmount)||0)) * 100) / 100,
+      notes: c.notes || '', createdAt: c.createdAt || todayKey()
+    }));
+    out.entries = (db.entries || []).map(e => Object.assign({}, e, {paymentId: e.clientId}));
+    out.entries.forEach(e => { delete e.clientId; });
+    return out;
+  }
+
+  /* v1: clients + matters + payments */
+  const byClient = {};
+  (db.clients || []).forEach(c => {
+    byClient[c.id] = {id:c.id, name:c.name, phone:c.phone || '', amount:0,
+                      notes:c.notes || '', createdAt:c.createdAt || todayKey()};
   });
-
-  /* every old payment becomes a log entry, keeping its money and its due date */
+  (db.matters || []).forEach(m => {
+    const p = byClient[m.clientId]; if(!p) return;
+    const base = Number(m.feeAmount) || 0;
+    p.amount += (m.vatMode === 'plus' ? base * (1 + rate) : base);
+    if(m.title) p.notes = ((p.notes ? p.notes + '\n' : '') + m.title).trim();
+  });
   (db.payments || []).forEach(p => {
     const m = (db.matters || []).find(x => x.id === p.matterId);
-    if(!m) return;
+    if(!m || !byClient[m.clientId]) return;
     const paid = p.status === 'paid';
     out.entries.push({
-      id: p.id || uid(), clientId: m.clientId,
+      id: p.id || uid(), paymentId: m.clientId,
       date: (paid ? p.paidDate : p.dueDate) || todayKey(),
       content: [p.notes, m.title, paid ? p.method : (p.status === 'cancelled' ? 'בוטל' : 'תשלום מתוכנן'),
                 p.receiptNo ? 'קבלה ' + p.receiptNo : ''].filter(Boolean).join(' · '),
       amount: paid ? (Number(p.amount) || 0) : 0,
       reminderAt: (!paid && p.status === 'pending') ? (p.dueDate || null) : null,
-      reminderDone: false,
-      createdAt: p.createdAt || todayKey()
+      reminderDone: false, createdAt: p.createdAt || todayKey()
     });
   });
-  out.clients.forEach(c => { c.feeAmount = Math.round(c.feeAmount * 100) / 100; });
+  out.payments = Object.values(byClient).map(p =>
+    Object.assign(p, {amount: Math.round(p.amount * 100) / 100}));
   return out;
 }
 
 /* ==================================================================
    6. DOMAIN
    ================================================================== */
-const vatRate = () => (DB.settings && DB.settings.vatRate != null ? DB.settings.vatRate : 18) / 100;
+const payById = id => DB.payments.find(p => p.id === id);
+const payName = id => { const p = payById(id); return p ? p.name : '—'; };
 
-/** What the client owes in total, VAT included. */
-function clientGross(c){
-  const base = Number(c.feeAmount) || 0;
-  return c.vatMode === 'plus' ? base * (1 + vatRate()) : base;
-}
-const clientEntries = id => DB.entries.filter(e => e.clientId === id)
-  .sort((a,b) => (a.date === b.date ? (b.createdAt||'').localeCompare(a.createdAt||'') : (a.date < b.date ? 1 : -1)));
-const clientPaid = id => DB.entries.filter(e => e.clientId === id)
+const payEntries = id => DB.entries.filter(e => e.paymentId === id)
+  .sort((a,b) => (a.date === b.date ? String(b.createdAt||'').localeCompare(String(a.createdAt||''))
+                                    : (a.date < b.date ? 1 : -1)));
+/** How much has actually come in against this payment. */
+const paidOf = id => DB.entries.filter(e => e.paymentId === id)
   .reduce((s,e) => s + (Number(e.amount) || 0), 0);
-const clientBalance = c => clientGross(c) - clientPaid(c.id);
-const clientById = id => DB.clients.find(c => c.id === id);
-const clientName = id => { const c = clientById(id); return c ? c.name : '—'; };
+const balanceOf = p => (Number(p.amount) || 0) - paidOf(p.id);
 
-/** Reminders that have come due and were not ticked off. */
 function dueReminders(){
   return DB.entries.filter(e => e.reminderAt && !e.reminderDone && daysUntil(e.reminderAt) <= 0)
     .sort((a,b) => a.reminderAt < b.reminderAt ? -1 : 1);
@@ -437,104 +442,98 @@ function upcomingReminders(){
    ================================================================== */
 function go(s, id){
   screen = s;
-  if(s === 'client') curClient = id;
+  if(s === 'pay') curPay = id;
   window.scrollTo(0, 0);
   render();
 }
 function render(){
-  const navMap = {client:'clients'};
+  const navMap = {pay:'list'};
   document.querySelectorAll('nav button').forEach(b => {
     b.classList.toggle('on', b.dataset.nav === (navMap[screen] || screen));
     const old = b.querySelector('.dot'); if(old) old.remove();
   });
-  const due = DB ? dueReminders().length : 0;
-  if(due){
+  if(DB && dueReminders().length){
     const btn = document.querySelector('nav button[data-nav="reminders"]');
     if(btn){ const d = document.createElement('span'); d.className = 'dot'; btn.appendChild(d); }
   }
-  const fn = {dash:viewDash, clients:viewClients, client:viewClient,
-              reminders:viewReminders, ledger:viewLedger, reports:viewReports, settings:viewSettings}[screen];
+  /* the floating add button belongs only to the main list */
+  $('fab').classList.toggle('hide', screen !== 'list');
+  const fn = {list:viewList, pay:viewPay, reminders:viewReminders,
+              reports:viewReports, settings:viewSettings}[screen];
   $('view').innerHTML = fn ? fn() : '';
 }
 
 /* ==================================================================
-   8. DASHBOARD
+   8. MAIN LIST — everything revolves around payments
    ================================================================== */
-function viewDash(){
-  const gross = DB.clients.reduce((s,c) => s + clientGross(c), 0);
-  const paid  = DB.entries.reduce((s,e) => s + (Number(e.amount) || 0), 0);
-  const mk = todayKey().slice(0,7);
-  const thisMonth = DB.entries.filter(e => (e.date||'').slice(0,7) === mk)
-    .reduce((s,e) => s + (Number(e.amount) || 0), 0);
+let listQ = '', listFilter = 'open';
+function viewList(){
+  const total = DB.payments.reduce((s,p) => s + (Number(p.amount)||0), 0);
+  const paid  = DB.entries.reduce((s,e) => s + (Number(e.amount)||0), 0);
 
   let h = '<div class="stats">' +
-    stat('סה״כ שכ״ט', money(gross)) +
-    stat('נגבה', money(paid), 'g') +
-    stat('יתרה לגבייה', money(gross - paid), gross - paid > 0.5 ? 'r' : 'g') +
-    stat('נכנס החודש', money(thisMonth), 'g') +
+    stat('סה״כ', money(total)) +
+    stat('שולם', money(paid), 'g') +
+    stat('יתרה', money(total - paid), total - paid > 0.5 ? 'r' : 'g') +
   '</div>';
 
-  if(!DB.clients.length){
-    return h + '<div class="card"><div class="empty">' +
-      '<div style="font-size:38px;margin-bottom:8px">⚖️</div>' +
-      'עוד אין לקוחות.<br>מוסיפים לקוח, קובעים את שכר הטרחה, ומשם מתחילים לרשום שורות.' +
-      '<div style="margin-top:16px"><button class="btn" onclick="editClient()">הוספת לקוח ראשון</button></div>' +
-      '</div></div>';
-  }
-
-  /* reminders that came due — the thing she must not miss */
   const due = dueReminders();
   if(due.length){
     h += '<div class="card alert"><h2><span class="bar"></span>🔔 תזכורות להיום<span class="cnt">' +
       due.length + '</span></h2>' + due.map(remRow).join('') + '</div>';
   }
 
-  const soon = upcomingReminders().filter(e => daysUntil(e.reminderAt) <= 14);
-  if(soon.length){
-    h += '<div class="card"><h2><span class="bar"></span>תזכורות קרובות<span class="cnt">' +
-      soon.length + '</span></h2>' + soon.map(remRow).join('') + '</div>';
+  if(!DB.payments.length){
+    return h + '<div class="card"><div class="empty">' +
+      '<div style="font-size:38px;margin-bottom:8px">💰</div>' +
+      'עוד אין תשלומים.<br>מוסיפים שם, טלפון וסכום — וזהו.' +
+      '<div style="margin-top:16px"><button class="btn" onclick="editPayment()">＋ תשלום חדש</button></div>' +
+      '</div></div>';
   }
 
-  const owing = DB.clients.filter(c => clientBalance(c) > 0.5)
-    .sort((a,b) => clientBalance(b) - clientBalance(a)).slice(0, 8);
-  h += '<div class="card"><h2><span class="bar"></span>יתרות פתוחות</h2>';
-  h += owing.length ? owing.map(clientRow).join('')
-                    : '<div class="empty">אין יתרות פתוחות 🎉</div>';
-  h += '</div>';
-
-  const recent = DB.entries.filter(e => Number(e.amount) > 0)
-    .sort((a,b) => a.date < b.date ? 1 : -1).slice(0, 5);
-  if(recent.length){
-    h += '<div class="card"><h2><span class="bar"></span>תקבולים אחרונים</h2>' +
-      recent.map(e => '<div class="row clickable" onclick="go(\'client\',\'' + e.clientId + '\')">' +
-        '<div class="grow"><div class="nm">' + esc(clientName(e.clientId)) + '</div>' +
-        '<div class="meta">' + heDate(e.date) + (e.content ? ' · ' + esc(e.content) : '') + '</div></div>' +
-        '<div class="amt" style="color:var(--ok)">' + money(e.amount) + '</div></div>').join('') + '</div>';
-  }
+  h += '<div class="chips" style="margin-bottom:12px">' +
+    [['open','לא שולמו'],['paid','שולמו'],['all','הכל']].map(f =>
+      '<button class="chip' + (listFilter === f[0] ? ' on' : '') +
+      '" onclick="listFilter=\'' + f[0] + '\';render()">' + f[1] + '</button>').join('') + '</div>';
+  h += '<div class="search"><input type="text" id="lq" placeholder="חיפוש לפי שם או טלפון" value="' +
+       esc(listQ) + '" oninput="listQ=this.value;renderList()"></div>';
+  h += '<div id="payList">' + listHTML() + '</div>';
   return h;
+}
+function renderList(){ $('payList').innerHTML = listHTML(); }
+function listHTML(){
+  let list = DB.payments.slice();
+  if(listFilter === 'open') list = list.filter(p => balanceOf(p) > 0.5);
+  if(listFilter === 'paid') list = list.filter(p => balanceOf(p) <= 0.5);
+  const q = listQ.trim();
+  if(q) list = list.filter(p => (p.name + ' ' + (p.phone||'')).includes(q));
+  list.sort((a,b) => balanceOf(b) - balanceOf(a));
+  if(!list.length) return '<div class="card"><div class="empty">אין תשלומים להצגה</div></div>';
+
+  return '<div class="card">' + list.map(p => {
+    const amt = Number(p.amount) || 0, pd = paidOf(p.id), bal = amt - pd;
+    const pct = amt > 0 ? Math.min(100, Math.round(pd / amt * 100)) : 0;
+    const hasDue = DB.entries.some(e => e.paymentId === p.id && e.reminderAt &&
+                                        !e.reminderDone && daysUntil(e.reminderAt) <= 0);
+    return '<div class="row clickable" onclick="go(\'pay\',\'' + p.id + '\')">' +
+      '<div class="grow"><div class="nm">' + esc(p.name) +
+        (hasDue ? ' <span class="badge b-late">🔔</span>' : '') + '</div>' +
+      '<div class="meta">' + (p.phone ? esc(p.phone) + ' · ' : '') +
+        money(amt) + (pd > 0 ? ' · שולם ' + pct + '%' : '') + '</div>' +
+      (pd > 0 && bal > 0.5 ? '<div class="progbar"><i style="width:' + pct + '%"></i></div>' : '') + '</div>' +
+      '<div class="amt" style="color:' + (bal > 0.5 ? 'var(--bad)' : 'var(--ok)') + '">' +
+      (bal > 0.5 ? money(bal) : '✓ שולם') + '</div></div>';
+  }).join('') + '</div>';
 }
 function stat(lbl, val, cls){
   return '<div class="stat ' + (cls||'') + '"><div class="lbl">' + lbl + '</div><div class="val">' + val + '</div></div>';
 }
-function clientRow(c){
-  const g = clientGross(c), p = clientPaid(c.id), bal = g - p;
-  const pct = g > 0 ? Math.min(100, Math.round(p / g * 100)) : 0;
-  return '<div class="row clickable" onclick="go(\'client\',\'' + c.id + '\')">' +
-    '<div class="grow"><div class="nm">' + esc(c.name) + '</div>' +
-    '<div class="meta">' + (g > 0 ? 'שכ״ט ' + money(g) + ' · שולם ' + pct + '%' : 'לא נקבע שכר טרחה') + '</div>' +
-    (g > 0 ? '<div class="progbar"><i style="width:' + pct + '%"></i></div>' : '') + '</div>' +
-    '<div class="amt" style="color:' + (bal > 0.5 ? 'var(--bad)' : 'var(--ok)') + '">' +
-    (g > 0 ? (bal > 0.5 ? money(bal) : '✓') : '—') + '</div></div>';
-}
-/** A reminder line, shown on the dashboard and the reminders screen. */
 function remRow(e){
   const d = daysUntil(e.reminderAt);
-  const when = d < 0 ? 'עבר לפני ' + Math.abs(d) + ' ימים'
-             : d === 0 ? 'היום'
-             : 'בעוד ' + d + ' ימים';
+  const when = d < 0 ? 'עבר לפני ' + Math.abs(d) + ' ימים' : d === 0 ? 'היום' : 'בעוד ' + d + ' ימים';
   return '<div class="row">' +
-    '<div class="grow clickable" onclick="go(\'client\',\'' + e.clientId + '\')">' +
-    '<div class="nm">' + esc(clientName(e.clientId)) + '</div>' +
+    '<div class="grow clickable" onclick="go(\'pay\',\'' + e.paymentId + '\')">' +
+    '<div class="nm">' + esc(payName(e.paymentId)) + '</div>' +
     '<div class="meta">' + esc(e.content || 'תזכורת') + '<br>' +
       '<span class="badge ' + (d <= 0 ? 'b-late' : 'b-soon') + '">' + heDate(e.reminderAt) + ' · ' + when + '</span>' +
     '</div></div>' +
@@ -552,75 +551,76 @@ async function snoozeReminder(id, days){
 }
 
 /* ==================================================================
-   9. CLIENTS
+   9. ADD / EDIT A PAYMENT  — name, phone, amount
    ================================================================== */
-let clientQ = '';
-function viewClients(){
-  let h = '<div class="btnbar" style="margin-bottom:12px">' +
-    '<button class="btn" onclick="editClient()">＋ לקוח חדש</button></div>';
-  h += '<div class="search"><input type="text" id="cq" placeholder="חיפוש לפי שם / טלפון / ת״ז" value="' +
-       esc(clientQ) + '" oninput="clientQ=this.value;renderClientList()"></div>';
-  h += '<div id="clientList">' + clientListHTML() + '</div>';
-  return h;
+function editPayment(id){
+  const p = id ? payById(id) : null;
+  modal(p ? 'עריכת תשלום' : 'תשלום חדש',
+    fld('שם הלקוח *', '<input type="text" id="p_name" value="' + esc(p ? p.name : '') + '">') +
+    fld('טלפון', '<input type="tel" id="p_phone" value="' + esc(p ? p.phone : '') + '">') +
+    fld('סכום (₪) *', '<input type="number" id="p_amount" step="0.01" min="0" value="' +
+        (p && p.amount ? p.amount : '') + '">') +
+    fld('הערות', '<textarea id="p_notes">' + esc(p ? p.notes : '') + '</textarea>') +
+    '<button class="btn full" onclick="savePayment(' + (id ? "'" + id + "'" : 'null') + ')">שמירה</button>');
+  setTimeout(() => $('p_name').focus(), 80);
 }
-function renderClientList(){ $('clientList').innerHTML = clientListHTML(); }
-function clientListHTML(){
-  const q = clientQ.trim();
-  let list = DB.clients.slice().sort((a,b) => a.name.localeCompare(b.name, 'he'));
-  if(q) list = list.filter(c => (c.name + ' ' + (c.phone||'') + ' ' + (c.idNumber||'')).includes(q));
-  if(!list.length) return '<div class="card"><div class="empty">אין לקוחות להצגה</div></div>';
-  return '<div class="card">' + list.map(clientRow).join('') + '</div>';
+async function savePayment(id){
+  const name = $('p_name').value.trim();
+  if(!name) return toast('חובה להזין שם');
+  const amount = Number($('p_amount').value) || 0;
+  const data = {name, phone:$('p_phone').value.trim(), amount, notes:$('p_notes').value.trim()};
+  let newId = id;
+  if(id) Object.assign(payById(id), data);
+  else { newId = uid(); DB.payments.push(Object.assign({id:newId, createdAt:todayKey()}, data)); }
+  closeModal(); await save();
+  if(id) render(); else go('pay', newId);
+  toast('נשמר');
+}
+async function delPayment(id){
+  const n = DB.entries.filter(e => e.paymentId === id).length;
+  if(!confirm(n ? 'לתשלום זה ' + n + ' שורות ביומן. המחיקה תמחק גם אותן. להמשיך?' : 'למחוק תשלום זה?')) return;
+  DB.entries = DB.entries.filter(e => e.paymentId !== id);
+  DB.payments = DB.payments.filter(p => p.id !== id);
+  await save(); go('list'); toast('נמחק');
 }
 
-/* ---- the main working screen: fee on top, log below ---- */
-function viewClient(){
-  const c = clientById(curClient);
-  if(!c) return '<div class="card"><div class="empty">הלקוח לא נמצא</div></div>';
-  const base = Number(c.feeAmount) || 0;
-  const g = clientGross(c), paid = clientPaid(c.id), bal = g - paid;
-  const ents = clientEntries(c.id);
+/* ==================================================================
+   10. PAYMENT DETAIL — header + running log
+   ================================================================== */
+function viewPay(){
+  const p = payById(curPay);
+  if(!p) return '<div class="card"><div class="empty">התשלום לא נמצא</div></div>';
+  const amt = Number(p.amount) || 0, pd = paidOf(p.id), bal = amt - pd;
+  const ents = payEntries(p.id);
 
-  let h = '<a class="back" onclick="go(\'clients\')">→ חזרה ללקוחות</a>';
-
-  h += '<div class="feehead"><div class="nm">' + esc(c.name) + '</div>';
-  if(c.phone) h += '<div class="ph">' + esc(c.phone) + (c.idNumber ? ' · ת״ז ' + esc(c.idNumber) : '') + '</div>';
-  if(g > 0){
-    h += '<div class="g3">' +
-      '<div><div class="l">שכר טרחה</div><div class="v">' + money(g) + '</div></div>' +
-      '<div><div class="l">שולם</div><div class="v">' + money(paid) + '</div></div>' +
-      '<div><div class="l">יתרה</div><div class="v">' + money(bal) + '</div></div></div>';
-    if(c.vatMode === 'plus')
-      h += '<div style="font-size:11px;opacity:.7;margin-top:8px;text-align:center">' +
-           money(base) + ' + מע״מ ' + (vatRate()*100) + '%</div>';
-  } else {
-    h += '<div class="nofee">עוד לא נקבע שכר טרחה — ' +
-         '<a style="color:#fff;text-decoration:underline" onclick="editClient(\'' + c.id + '\')">קביעה עכשיו</a></div>';
-  }
-  h += '</div>';
+  let h = '<a class="back" onclick="go(\'list\')">→ חזרה לתשלומים</a>';
+  h += '<div class="head"><div class="nm">' + esc(p.name) + '</div>';
+  if(p.phone) h += '<div class="ph"><a href="tel:' + esc(p.phone) + '">📞 ' + esc(p.phone) + '</a></div>';
+  h += '<div class="g3">' +
+    '<div><div class="l">סכום</div><div class="v">' + money(amt) + '</div></div>' +
+    '<div><div class="l">שולם</div><div class="v">' + money(pd) + '</div></div>' +
+    '<div><div class="l">יתרה</div><div class="v">' + money(bal) + '</div></div></div></div>';
 
   h += '<div class="btnbar" style="margin-bottom:13px">' +
-    '<button class="btn" onclick="editEntry(null,\'' + c.id + '\')">＋ שורה חדשה</button>' +
-    '<button class="btn sec sm" onclick="editClient(\'' + c.id + '\')">עריכת פרטים</button>' +
-    '<button class="btn dang sm" onclick="delClient(\'' + c.id + '\')">מחיקה</button></div>';
+    '<button class="btn" onclick="editEntry(null,\'' + p.id + '\')">＋ שורה חדשה</button>' +
+    '<button class="btn sec sm" onclick="editPayment(\'' + p.id + '\')">עריכה</button>' +
+    '<button class="btn dang sm" onclick="delPayment(\'' + p.id + '\')">מחיקה</button></div>';
 
-  if(c.notes)
+  if(p.notes)
     h += '<div class="card"><div style="font-size:13px;white-space:pre-line;color:var(--ink2)">' +
-         esc(c.notes) + '</div></div>';
+         esc(p.notes) + '</div></div>';
 
   h += '<div class="card"><h2><span class="bar"></span>יומן<span class="cnt">' + ents.length + '</span></h2>';
   h += ents.length
     ? '<div class="tl">' + ents.map(entryHTML).join('') + '</div>'
     : '<div class="empty">אין עדיין שורות.<br>כל שורה = תאריך, תוכן, וסכום אם התקבל תשלום.</div>';
-  h += '</div>';
-  return h;
+  return h + '</div>';
 }
-/** One line in the client's log. */
 function entryHTML(e){
   const hasMoney = Number(e.amount) > 0;
   const remLive = e.reminderAt && !e.reminderDone;
   const d = remLive ? daysUntil(e.reminderAt) : null;
-  let cls = 'ent' + (hasMoney ? ' money' : '') + (remLive && !hasMoney ? ' rem' : '');
-  let h = '<div class="' + cls + '">';
+  let h = '<div class="ent' + (hasMoney ? ' money' : '') + (remLive && !hasMoney ? ' rem' : '') + '">';
   h += '<div class="top"><div style="flex:1;min-width:0">' +
        '<div class="dt">' + heDateLong(e.date) + '</div>' +
        '<div class="txt">' + (e.content ? esc(e.content) : '<span class="muted">—</span>') + '</div></div>';
@@ -640,78 +640,20 @@ function entryHTML(e){
   return h + '</div>';
 }
 
-function editClient(id){
-  const c = id ? clientById(id) : null;
-  const vm = c ? (c.vatMode || 'plus') : 'plus';
-  modal(c ? 'עריכת לקוח' : 'לקוח חדש',
-    fld('שם מלא *', '<input type="text" id="f_name" value="' + esc(c ? c.name : '') + '">') +
-    '<div class="grid2">' +
-      fld('טלפון', '<input type="tel" id="f_phone" value="' + esc(c ? c.phone : '') + '">') +
-      fld('ת״ז', '<input type="text" id="f_id" value="' + esc(c ? c.idNumber : '') + '">') +
-    '</div>' +
-    fld('אימייל', '<input type="email" id="f_email" value="' + esc(c ? c.email : '') + '">') +
-    '<div style="height:1px;background:var(--line);margin:16px 0"></div>' +
-    fld('שכר טרחה שסוכם (₪)',
-        '<input type="number" id="f_fee" step="0.01" min="0" placeholder="0" value="' +
-        (c && c.feeAmount ? c.feeAmount : '') + '">') +
-    fld('מע״מ', '<div class="chips" id="f_vat">' +
-        Object.keys(VAT_MODES).map(k => '<button type="button" class="chip' + (vm === k ? ' on' : '') +
-          '" data-v="' + k + '" onclick="pickChip(this)">' + VAT_MODES[k] + '</button>').join('') + '</div>' +
-        '<div class="hint" id="vatHint"></div>') +
-    fld('הערות', '<textarea id="f_notes">' + esc(c ? c.notes : '') + '</textarea>') +
-    '<button class="btn full" onclick="saveClient(' + (id ? "'" + id + "'" : 'null') + ')">שמירה</button>');
-
-  const upd = () => {
-    const b = Number($('f_fee').value) || 0;
-    const mode = $('f_vat').querySelector('.on').dataset.v;
-    $('vatHint').textContent = b ? 'סה״כ לגבייה: ' + money(mode === 'plus' ? b * (1 + vatRate()) : b) : '';
-  };
-  $('f_fee').addEventListener('input', upd);
-  $('f_vat').addEventListener('click', () => setTimeout(upd, 0));
-  upd();
-  setTimeout(() => $('f_name').focus(), 80);
-}
-function pickChip(btn){
-  btn.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
-  btn.classList.add('on');
-}
-async function saveClient(id){
-  const name = $('f_name').value.trim();
-  if(!name) return toast('חובה להזין שם');
-  const data = {name, phone:$('f_phone').value.trim(), idNumber:$('f_id').value.trim(),
-                email:$('f_email').value.trim(), notes:$('f_notes').value.trim(),
-                feeAmount:Number($('f_fee').value) || 0,
-                vatMode:$('f_vat').querySelector('.on').dataset.v};
-  let newId = id;
-  if(id) Object.assign(clientById(id), data);
-  else { newId = uid(); DB.clients.push(Object.assign({id:newId, createdAt:todayKey()}, data)); }
-  closeModal(); await save();
-  if(id) render(); else go('client', newId);
-  toast('נשמר');
-}
-async function delClient(id){
-  const n = DB.entries.filter(e => e.clientId === id).length;
-  if(!confirm(n ? 'ללקוח זה ' + n + ' שורות ביומן. המחיקה תמחק גם אותן. להמשיך?' : 'למחוק לקוח זה?')) return;
-  DB.entries = DB.entries.filter(e => e.clientId !== id);
-  DB.clients = DB.clients.filter(c => c.id !== id);
-  await save(); go('clients'); toast('נמחק');
-}
-
 /* ==================================================================
-   10. LOG ENTRIES  (date + content + optional amount + optional reminder)
+   11. LOG ENTRIES — date + content + optional amount + optional reminder
    ================================================================== */
-function editEntry(id, clientId){
-  if(!DB.clients.length){ toast('צריך להוסיף לקוח קודם'); return; }
+function editEntry(id, paymentId){
+  if(!DB.payments.length){ toast('צריך להוסיף תשלום קודם'); return; }
   const e = id ? DB.entries.find(x => x.id === id) : null;
-  const cid = e ? e.clientId : (clientId || (curClient || DB.clients[0].id));
-  const cOpts = DB.clients.slice().sort((a,b) => a.name.localeCompare(b.name,'he'))
-    .map(c => '<option value="' + c.id + '"' + (c.id === cid ? ' selected' : '') + '>' + esc(c.name) + '</option>').join('');
+  const pid = e ? e.paymentId : (paymentId || curPay || DB.payments[0].id);
+  const opts = DB.payments.slice().sort((a,b) => a.name.localeCompare(b.name,'he'))
+    .map(p => '<option value="' + p.id + '"' + (p.id === pid ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('');
   const remOn = !!(e && e.reminderAt && !e.reminderDone);
-  /* when editing a live reminder, show how many days out it currently sits */
   const remDays = remOn ? Math.max(0, daysUntil(e.reminderAt)) : 7;
 
   modal(e ? 'עריכת שורה' : 'שורה חדשה',
-    fld('לקוח *', '<select id="e_client">' + cOpts + '</select>') +
+    fld('תשלום *', '<select id="e_pay">' + opts + '</select>') +
     fld('תאריך *', '<input type="date" id="e_date" value="' + esc(e ? e.date : todayKey()) + '">') +
     fld('תוכן', '<textarea id="e_content" placeholder="מה קרה / מה סוכם / איזה תשלום התקבל">' +
         esc(e ? e.content : '') + '</textarea>' +
@@ -739,7 +681,7 @@ function editEntry(id, clientId){
   toggleRem();
   setTimeout(() => $('e_content').focus(), 80);
 }
-/** Append a quick-pick phrase into the content box instead of replacing it. */
+/** Append a quick phrase rather than replacing what is already typed. */
 function addQuick(btn){
   const t = $('e_content');
   t.value = t.value.trim() ? t.value.trim() + ' · ' + btn.textContent : btn.textContent;
@@ -753,8 +695,7 @@ function toggleRem(){
 }
 function updRemHint(){
   const d = Math.max(0, Number($('e_remdays').value) || 0);
-  const from = $('e_date').value || todayKey();
-  $('remHint').innerHTML = 'התזכורת תופיע ב־<b>' + heDateLong(addDays(from, d)) + '</b>';
+  $('remHint').innerHTML = 'התזכורת תופיע ב־<b>' + heDateLong(addDays($('e_date').value || todayKey(), d)) + '</b>';
 }
 async function saveEntry(id){
   const date = $('e_date').value;
@@ -767,13 +708,13 @@ async function saveEntry(id){
 
   const remOn = $('e_rem').checked;
   const data = {
-    clientId: $('e_client').value, date, content, amount,
+    paymentId: $('e_pay').value, date, content, amount,
     reminderAt: remOn ? addDays(date, Math.max(0, Number($('e_remdays').value) || 0)) : null,
     reminderDone: false
   };
   if(id){
     const e = DB.entries.find(x => x.id === id);
-    /* keep a reminder already ticked off from popping back up */
+    /* an unchanged reminder that was already ticked off stays ticked off */
     if(remOn && e.reminderAt === data.reminderAt && e.reminderDone) data.reminderDone = true;
     Object.assign(e, data);
   } else {
@@ -788,17 +729,14 @@ async function delEntry(id){
 }
 
 /* ==================================================================
-   11. REMINDERS SCREEN
+   12. REMINDERS
    ================================================================== */
 function viewReminders(){
   const due = dueReminders(), up = upcomingReminders();
   const done = DB.entries.filter(e => e.reminderAt && e.reminderDone)
     .sort((a,b) => a.reminderAt < b.reminderAt ? 1 : -1).slice(0, 15);
 
-  let h = '<div class="btnbar" style="margin-bottom:12px">' +
-    '<button class="btn" onclick="editEntry()">＋ שורה עם תזכורת</button></div>';
-
-  h += '<div class="card' + (due.length ? ' alert' : '') + '"><h2><span class="bar"></span>הגיע זמנן' +
+  let h = '<div class="card' + (due.length ? ' alert' : '') + '"><h2><span class="bar"></span>הגיע זמנן' +
        (due.length ? '<span class="cnt">' + due.length + '</span>' : '') + '</h2>';
   h += due.length ? due.map(remRow).join('') : '<div class="empty">אין תזכורות פתוחות 🎉</div>';
   h += '</div>';
@@ -810,41 +748,12 @@ function viewReminders(){
 
   if(done.length){
     h += '<div class="card"><h2><span class="bar"></span>בוצעו</h2>' + done.map(e =>
-      '<div class="row clickable" onclick="go(\'client\',\'' + e.clientId + '\')">' +
-      '<div class="grow"><div class="nm" style="color:var(--ink2)">' + esc(clientName(e.clientId)) + '</div>' +
+      '<div class="row clickable" onclick="go(\'pay\',\'' + e.paymentId + '\')">' +
+      '<div class="grow"><div class="nm" style="color:var(--ink2)">' + esc(payName(e.paymentId)) + '</div>' +
       '<div class="meta">' + esc(e.content || '') + ' · ' + heDate(e.reminderAt) + '</div></div>' +
       '<span class="badge b-ok">✓</span></div>').join('') + '</div>';
   }
   return h;
-}
-
-/* ==================================================================
-   12. LEDGER  (every entry that carried money)
-   ================================================================== */
-let ledgerQ = '';
-function viewLedger(){
-  let h = '<div class="btnbar" style="margin-bottom:12px">' +
-    '<button class="btn" onclick="editEntry()">＋ שורה חדשה</button></div>';
-  h += '<div class="search"><input type="text" id="lq" placeholder="חיפוש לפי לקוח / תוכן" value="' +
-       esc(ledgerQ) + '" oninput="ledgerQ=this.value;renderLedger()"></div>';
-  h += '<div id="ledgerList">' + ledgerHTML() + '</div>';
-  return h;
-}
-function renderLedger(){ $('ledgerList').innerHTML = ledgerHTML(); }
-function ledgerHTML(){
-  const q = ledgerQ.trim();
-  let list = DB.entries.filter(e => Number(e.amount) > 0);
-  if(q) list = list.filter(e => (clientName(e.clientId) + ' ' + (e.content||'')).includes(q));
-  list.sort((a,b) => a.date < b.date ? 1 : -1);
-  const sum = list.reduce((s,e) => s + Number(e.amount), 0);
-  let h = '<div class="card"><h2><span class="bar"></span>' + list.length + ' תקבולים · ' + money(sum) + '</h2>';
-  h += list.length ? list.map(e =>
-    '<div class="row clickable" onclick="go(\'client\',\'' + e.clientId + '\')">' +
-    '<div class="grow"><div class="nm">' + esc(clientName(e.clientId)) + '</div>' +
-    '<div class="meta">' + heDate(e.date) + (e.content ? ' · ' + esc(e.content) : '') + '</div></div>' +
-    '<div class="amt" style="color:var(--ok)">' + money(e.amount) + '</div></div>').join('')
-    : '<div class="empty">אין תקבולים להצגה</div>';
-  return h + '</div>';
 }
 
 /* ==================================================================
@@ -874,32 +783,39 @@ function viewReports(){
       '<div class="bv">' + (v ? money(v) : '—') + '</div></div>';
   }).join('') + '</div></div>';
 
-  const rows = DB.clients.map(c => ({name:c.name, g:clientGross(c), p:clientPaid(c.id), bal:clientBalance(c)}))
-    .filter(r => r.g > 0 || r.p > 0).sort((a,b) => b.bal - a.bal);
-  h += '<div class="card"><h2><span class="bar"></span>לפי לקוח</h2>';
+  const rows = DB.payments.map(p => ({name:p.name, phone:p.phone, a:Number(p.amount)||0,
+                                      pd:paidOf(p.id), bal:balanceOf(p)}))
+    .sort((a,b) => b.bal - a.bal);
+  h += '<div class="card"><h2><span class="bar"></span>פירוט מלא</h2>';
   h += rows.length
-    ? '<div style="overflow-x:auto"><table class="rep"><thead><tr><th>לקוח</th><th>שכ״ט</th><th>שולם</th><th>יתרה</th></tr></thead><tbody>' +
-      rows.map(r => '<tr><td>' + esc(r.name) + '</td><td>' + money(r.g) + '</td>' +
-        '<td style="color:var(--ok)">' + money(r.p) + '</td>' +
+    ? '<div style="overflow-x:auto"><table class="rep"><thead><tr><th>שם</th><th>סכום</th><th>שולם</th><th>יתרה</th></tr></thead><tbody>' +
+      rows.map(r => '<tr><td>' + esc(r.name) + '</td><td>' + money(r.a) + '</td>' +
+        '<td style="color:var(--ok)">' + money(r.pd) + '</td>' +
         '<td style="color:' + (r.bal > 0.5 ? 'var(--bad)' : 'var(--ok)') + ';font-weight:700">' +
         money(r.bal) + '</td></tr>').join('') + '</tbody></table></div>'
     : '<div class="empty">אין נתונים</div>';
   h += '</div>';
 
   h += '<div class="card"><h2><span class="bar"></span>ייצוא</h2>' +
-    '<div class="btnbar"><button class="btn sm sec" onclick="exportCSV()">ייצוא היומן ל־CSV</button>' +
+    '<div class="btnbar"><button class="btn sm sec" onclick="exportCSV()">ייצוא ל־CSV</button>' +
     '<button class="btn sm sec" onclick="exportJSON()">גיבוי מלא (JSON)</button></div>' +
     '<div class="hint">קובץ ה־CSV נפתח באקסל. הגיבוי המלא אינו מוצפן — שמרי אותו במקום בטוח.</div></div>';
   return h;
 }
 function exportCSV(){
-  const head = ['לקוח','תאריך','תוכן','סכום ששולם','תזכורת','בוצעה'];
   const cell = v => '"' + String(v == null ? '' : v).replace(/"/g,'""') + '"';
-  const lines = [head.join(',')];
+  const lines = [['שם','טלפון','תאריך','תוכן','סכום ששולם','תזכורת','בוצעה'].join(',')];
   DB.entries.slice().sort((a,b) => a.date < b.date ? 1 : -1).forEach(e => {
-    lines.push([clientName(e.clientId), e.date, e.content || '',
+    const p = payById(e.paymentId);
+    lines.push([p ? p.name : '', p ? p.phone : '', e.date, e.content || '',
                 Number(e.amount) > 0 ? e.amount : '',
                 e.reminderAt || '', e.reminderAt ? (e.reminderDone ? 'כן' : 'לא') : ''].map(cell).join(','));
+  });
+  lines.push('');
+  lines.push(['—— סיכום ——'].map(cell).join(','));
+  lines.push(['שם','טלפון','סכום','שולם','יתרה'].join(','));
+  DB.payments.forEach(p => {
+    lines.push([p.name, p.phone || '', Number(p.amount)||0, paidOf(p.id), balanceOf(p)].map(cell).join(','));
   });
   download('﻿' + lines.join('\r\n'), 'shkar-tirha-' + todayKey() + '.csv', 'text/csv;charset=utf-8');
 }
@@ -918,7 +834,8 @@ function download(text, name, type){
    14. SETTINGS
    ================================================================== */
 function viewSettings(){
-  let h = '<div class="card"><h2><span class="bar"></span>סנכרון בין מכשירים</h2>';
+  let h = '<a class="back" onclick="go(\'list\')">→ חזרה</a>';
+  h += '<div class="card"><h2><span class="bar"></span>סנכרון בין מכשירים</h2>';
   h += syncUrl
     ? '<div class="okbox">הסנכרון פעיל. הנתונים בענן <b>מוצפנים</b> — בלי הסיסמה אי אפשר לקרוא אותם.</div>'
     : '<div class="warnbox">כרגע הנתונים נשמרים <b>רק במכשיר הזה</b>. כדי לראות אותם גם מהטלפון, הפעילי סנכרון.</div>';
@@ -933,16 +850,11 @@ function viewSettings(){
 
   const notifyOn = !!(DB.settings && DB.settings.notify);
   h += '<div class="card"><h2><span class="bar"></span>התראות</h2>' +
-    '<div class="warnbox">אתר לא יכול להתריע כשהוא סגור. התזכורות תמיד מחכות לך בדשבורד ובלשונית 🔔, ' +
-    'ובנוסף אפשר לקבל התראת דפדפן כשהאתר פתוח.</div>' +
+    '<div class="warnbox">אתר לא יכול להתריע כשהוא סגור. תזכורות תמיד מחכות בראש מסך התשלומים ' +
+    'ובלשונית 🔔, ובנוסף אפשר התראת דפדפן כשהאתר פתוח.</div>' +
     '<div class="switch" onclick="if(event.target.tagName!==\'INPUT\'){var b=document.getElementById(\'s_notify\');b.checked=!b.checked;saveNotify();}">' +
     '<input type="checkbox" id="s_notify"' + (notifyOn ? ' checked' : '') + ' onchange="saveNotify()">' +
     '<label for="s_notify">התראת דפדפן כשיש תזכורת שהגיע זמנה</label></div></div>';
-
-  h += '<div class="card"><h2><span class="bar"></span>מע״מ</h2>' +
-    fld('שיעור מע״מ (%)', '<input type="number" id="s_vat" step="0.1" value="' + DB.settings.vatRate + '">') +
-    '<button class="btn sm" onclick="saveVat()">שמירה</button>' +
-    '<div class="hint">משפיע על לקוחות שסומנו "בתוספת מע״מ".</div></div>';
 
   h += '<div class="card"><h2><span class="bar"></span>סיסמה</h2>' +
     '<div class="hint" style="margin-bottom:10px">שינוי הסיסמה מצפין מחדש את כל הנתונים. ' +
@@ -957,7 +869,7 @@ function viewSettings(){
     '<div class="hint">מומלץ להוריד גיבוי פעם בחודש.</div></div>';
 
   h += '<div class="card"><h2><span class="bar"></span>נתונים</h2>' +
-    '<div class="kv"><span class="muted">לקוחות</span><b>' + DB.clients.length + '</b></div>' +
+    '<div class="kv"><span class="muted">תשלומים</span><b>' + DB.payments.length + '</b></div>' +
     '<div class="kv"><span class="muted">שורות ביומן</span><b>' + DB.entries.length + '</b></div>' +
     '<div class="kv"><span class="muted">עדכון אחרון</span><b>' +
       new Date(DB.updatedAt).toLocaleString('he-IL') + '</b></div>' +
@@ -992,11 +904,6 @@ async function saveNotify(){
   DB.settings.notify = on;
   await save(); toast(on ? 'התראות הופעלו' : 'התראות בוטלו');
 }
-async function saveVat(){
-  const v = Number($('s_vat').value);
-  if(!(v >= 0)) return toast('ערך לא תקין');
-  DB.settings.vatRate = v; await save(); render(); toast('נשמר');
-}
 function changePassModal(){
   modal('שינוי סיסמה',
     '<div class="warnbox">אם תשכחי את הסיסמה החדשה — לא תהיה דרך לשחזר את הנתונים. ' +
@@ -1019,17 +926,17 @@ async function importJSON(input){
   const f = input.files[0]; if(!f) return;
   try{
     const obj = JSON.parse(await f.text());
-    if(!obj || !Array.isArray(obj.clients)) throw new Error('bad');
+    if(!obj || !(Array.isArray(obj.payments) || Array.isArray(obj.clients))) throw new Error('bad');
     if(!confirm('השחזור יחליף את כל הנתונים הקיימים. להמשיך?')) return;
-    DB = migrate(Object.assign(freshDB(), obj));
-    await save(); go('dash'); toast('שוחזר בהצלחה');
+    DB = migrate(obj);
+    await save(); go('list'); toast('שוחזר בהצלחה');
   } catch(e){ toast('קובץ לא תקין'); }
   input.value = '';
 }
 async function wipe(){
-  if(!confirm('פעולה זו תמחק את כל הלקוחות והשורות. להמשיך?')) return;
+  if(!confirm('פעולה זו תמחק את כל התשלומים והשורות. להמשיך?')) return;
   if(!confirm('בטוחה? אין דרך חזרה (אלא אם יש לך גיבוי).')) return;
-  DB = freshDB(); await save(); go('dash'); toast('הכל נמחק');
+  DB = freshDB(); await save(); go('list'); toast('הכל נמחק');
 }
 
 /* ==================================================================
@@ -1102,15 +1009,15 @@ async function tryUnlock(silent){
       } catch(e){ /* local copy uses an older password — ignore */ }
     }
 
-    const wasV1 = DB.v !== 2;
-    DB = migrate(Object.assign({}, freshDB(), DB));
-    if(!DB.settings) DB.settings = {vatRate:18, notify:false};
+    const wasOld = DB.v !== 3;
+    DB = migrate(DB);
+    if(!DB.settings) DB.settings = {notify:false};
 
     if($('remember').checked) localStorage.setItem(LS_PASS, p1);
     else localStorage.removeItem(LS_PASS);
     localStorage.setItem(LS_BLOB, JSON.stringify(bootBlob));
     enterApp();
-    if(wasV1){ await save(); toast('הנתונים הומרו למבנה החדש'); }
+    if(wasOld){ await save(); toast('הנתונים הומרו למבנה החדש'); }
     else if(dirty) save();
   } catch(e){
     localStorage.removeItem(LS_PASS);
@@ -1126,7 +1033,7 @@ function enterApp(){
   $('lock').classList.add('hide');
   $('app').classList.remove('hide');
   setSync(syncUrl ? 'ok' : '', syncUrl ? '☁️ מסונכרן' : '💾 מקומי — הפעילי סנכרון בהגדרות');
-  go('dash');
+  go('list');
   const due = dueReminders();
   if(due.length && DB.settings.notify && 'Notification' in window && Notification.permission === 'granted'){
     try{ new Notification('מעקב שכר טרחה', {body: due.length + ' תזכורות מחכות לך'}); } catch(e){}
